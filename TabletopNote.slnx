@@ -1,3 +1,6 @@
 <Solution>
+  <Project Path="TabletopNote.API/TabletopNote.API.csproj" Id="eaab280c-a177-40b6-9277-bfc76ac678af" />
+  <Project Path="TabletopNote.Core/TabletopNote.Core.csproj" Id="d8eb8ee6-b294-4d5e-a4d5-6ad5fe48860c" />
+  <Project Path="TabletopNote.Data/TabletopNote.Data.csproj" Id="6bf0af42-4a48-4741-94fd-f0e33a30cdda" />
   <Project Path="TabletopNote.UI/TabletopNote.UI.csproj" />
 </Solution>
