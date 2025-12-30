@@ -10,32 +10,52 @@ namespace TabletopNote.Data
         {
         }
 
-        public DbSet<CampaignEntity> Campaigns => Set<CampaignEntity>();
-        public DbSet<CampaignDocumentEntity> CampaignDocuments => Set<CampaignDocumentEntity>();
-        public DbSet<ReferenceDocumentEntity> ReferenceDocuments => Set<ReferenceDocumentEntity>();
-        public DbSet<CalendarEventEntity> CalendarEvents => Set<CalendarEventEntity>();
+        public DbSet<CampaignEntity> Campaigns {  get; set; }
+        public DbSet<CampaignDocumentEntity> CampaignDocuments { get; set; }
+        public DbSet<ReferenceDocumentEntity> ReferenceDocuments {  get; set; }
+        public DbSet<CalendarEventEntity> CalendarEvents { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<CampaignDocumentEntity>()
-                .HasOne(d => d.Campaign)
-                .WithMany(c => c.CampaignDocuments)
-                .HasForeignKey(d => d.CampaignId)
-                .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<CampaignEntity>(entity =>
+            {
+                entity.HasKey(e => e.CampaignId);
+                entity.ToTable("Campaigns");
+            });
 
-            modelBuilder.Entity<ReferenceDocumentEntity>()
-                .HasOne(d => d.Campaign)
-                .WithMany(c => c.ReferenceDocuments)
-                .HasForeignKey(d => d.CampaignId)
-                .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<CampaignDocumentEntity>(entity =>
+            {
+                entity.HasKey(e => e.DocumentId);
+                entity.ToTable("CampaignDocuments");
 
-            modelBuilder.Entity<CalendarEventEntity>()
-                .HasOne(d => d.Campaign)
-                .WithMany(c => c.CalendarEvents)
-                .HasForeignKey(d => d.CampaignId)
-                .OnDelete(DeleteBehavior.Cascade);
+                entity.HasOne(d => d.Campaign)
+                    .WithMany(c => c.CampaignDocuments)
+                    .HasForeignKey(d => d.CampaignId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<ReferenceDocumentEntity>(entity =>
+            {
+                entity.HasKey(e => e.FileId);
+                entity.ToTable("ReferenceDocuments");
+
+                entity.HasOne(d => d.Campaign)
+                    .WithMany(c => c.ReferenceDocuments)
+                    .HasForeignKey(d => d.CampaignId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<CalendarEventEntity>(entity =>
+            {
+                entity.HasKey(e => e.CalendarEventId);
+                entity.ToTable("CalendarEvents");
+
+                entity.HasOne(d => d.Campaign)
+                    .WithMany(c => c.CalendarEvents)
+                    .HasForeignKey(d => d.CampaignId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
 
         }
-
     }
 }
