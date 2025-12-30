@@ -1,0 +1,4 @@
+TabletopNote DB
+* Project backed by Sqlite DB
+* TabletopNoteDb(*.sql)                        ==> Schema files tracked in version control
+* TabletopNoteDb(*.db, *.sqlite, *.sqlite3)    ==> DB files ignored from version control

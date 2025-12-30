@@ -11,6 +11,6 @@ namespace TabletopNote.Core.Models
         public string EventDescription { get; set; } = string.Empty;
         public DateTime EventStartDate { get; set; }
         public DateTime EventEndDate { get; set; }
-
+        public bool IsGMVisibleOnly { get; set; }
     }
 }

@@ -14,4 +14,8 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\TabletopNote.Core\TabletopNote.Core.csproj" />
+  </ItemGroup>
+
 </Project>

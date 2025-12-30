@@ -6,11 +6,9 @@ namespace TabletopNote.Core.Models
     {
         public int CampaignId { get; set; }
         public string CampaignName { get; set; } = string.Empty;
-        public string CampaignNotes { get; set; } = string.Empty;
+        public string CampaignDescription { get; set; } = string.Empty;
         public List<CampaignDocument> CampaignDocuments { get; set; } = new();
         public List<ReferenceDocument> ReferenceDocuments { get; set; } = new();
         public List<CalendarEvent> CalendarEvents { get; set; } = new();
-        public DateTime CampaignCreatedAt { get; set; }
-        public DateTime CampaignUpdatedAt { get; set; }
     }
 }
