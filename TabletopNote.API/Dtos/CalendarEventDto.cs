@@ -1,6 +1,6 @@
-﻿namespace TabletopNote.Core.Models
+﻿namespace TabletopNote.API.Dtos
 {
-    public class CalendarEvent
+    public class CalendarEventDto
     {
         public int CalendarEventId { get; set; }
         public string EventName { get; set; } = string.Empty;
