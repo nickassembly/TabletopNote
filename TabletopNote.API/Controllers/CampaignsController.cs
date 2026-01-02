@@ -133,10 +133,28 @@ namespace TabletopNote.API.Controllers
             _context.Campaigns.Update(campaign);
             await _context.SaveChangesAsync();
 
-            return Ok();
+            return NoContent();
         }
 
-        // TODO - Delete Campaign
+        [HttpDelete("{id}")]
+        // DELETE - /campaigns/{id}
+        public async Task<ActionResult> DeleteCampaign(
+           [FromRoute] int id)
+        {
+            var campaign = await _context.Campaigns
+                        .Include(c => c.CampaignDocuments)
+                        .Include(c => c.CalendarEvents)
+                        .Include(c => c.ReferenceDocuments)
+                        .FirstOrDefaultAsync(c => c.CampaignId == id);
+
+            if (campaign == null)
+                return NotFound();
+
+            _context.Campaigns.Remove(campaign);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
 
 
     }

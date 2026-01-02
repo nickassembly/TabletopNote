@@ -49,6 +49,24 @@ namespace TabletopNote.API.Controllers
             return campaignDocumentDtos;
         }
 
+        [HttpGet("{documentId}")]
+        // GET - /campaigns/{campaignId}/documents/{documentId}
+        public async Task<ActionResult<CampaignDocumentDto>> GetCampaignDocumentById(
+            [FromRoute] int campaignId,
+            [FromRoute] int documentId)
+        {
+            var campaignExists = await _context.Campaigns.AnyAsync(c => c.CampaignId == campaignId);
+            var documentExists = await _context.CampaignDocuments.AnyAsync(d => d.DocumentId == documentId);
+
+            var campaignDocument = await _context.CampaignDocuments
+                .FirstOrDefaultAsync(d => d.DocumentId == documentId && d.CampaignId == campaignId);
+
+            if (campaignDocument is null)
+                return NotFound($"Document {documentId} for Campaign {campaignId} not found.");
+
+            return Ok(campaignDocument);
+        }
+
         [HttpPost]
         // POST - /campaigns/{campaignId}/documents
         public async Task<ActionResult> AddCampaignDocument(
@@ -84,25 +102,56 @@ namespace TabletopNote.API.Controllers
                 null);
         }
 
-        // TODO - update CampaignDocument
-        [HttpPut]
+        [HttpPut("{documentId}")]
         // PUT - /campaigns/{campaignId}/documents/{documentId}
         public async Task<ActionResult> UpdateCampaignDocument(
             [FromRoute] int campaignId,
             [FromRoute] int documentId,
             [FromBody] CampaignDocumentUpdateDto documentToUpdate)
         {
-            throw new NotImplementedException();
+            if (documentToUpdate is null) return BadRequest("Request body is required.");
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            var campaignExists = await _context.Campaigns.AnyAsync(c => c.CampaignId == campaignId);
+            var documentExists = await _context.CampaignDocuments.AnyAsync(d => d.DocumentId == documentId);
+
+            var campaignDocument = await _context.CampaignDocuments
+                .FirstOrDefaultAsync(d => d.DocumentId == documentId && d.CampaignId == campaignId);
+
+            if (campaignDocument is null)
+                return NotFound($"Document {documentId} for Campaign {campaignId} not found.");
+
+            campaignDocument.DocumentName = documentToUpdate.DocumentName;
+            campaignDocument.DocumentDescription = documentToUpdate.DocumentDescription;
+            campaignDocument.DocumentContentType = (int)documentToUpdate.DocumentContentType;
+            campaignDocument.DocumentContent = documentToUpdate.DocumentContent;
+            campaignDocument.IsGMVisibleOnly = documentToUpdate.IsGMVisibleOnly;
+            campaignDocument.DocumentUpdatedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+
+            return NoContent();
         }
 
-        // TODO - delete CampaignDocument
-        [HttpDelete]
-        // Delete - /campaigns/{campaignId}/documents/{documentId}
+        [HttpDelete("{documentId}")]
+        // DELETE - /campaigns/{campaignId}/documents/{documentId}
         public async Task<ActionResult> DeleteCampaignDocument(
-            [FromRoute] int campaignId,
-            [FromRoute] int documentId)
+             [FromRoute] int campaignId,
+             [FromRoute] int documentId)
         {
-            throw new NotImplementedException();
+            var campaignExists = await _context.Campaigns.AnyAsync(c => c.CampaignId == campaignId);
+            var documentExists = await _context.CampaignDocuments.AnyAsync(d => d.DocumentId == documentId);
+
+            var campaignDocument = await _context.CampaignDocuments
+                .FirstOrDefaultAsync(d => d.DocumentId == documentId && d.CampaignId == campaignId);
+
+            if (campaignDocument is null)
+                return NotFound($"Document {documentId} for Campaign {campaignId} not found.");
+
+            _context.CampaignDocuments.Remove(campaignDocument);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
         }
     }
 }

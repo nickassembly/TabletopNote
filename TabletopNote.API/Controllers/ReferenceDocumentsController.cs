@@ -46,6 +46,24 @@ namespace TabletopNote.API.Controllers
             return referenceDocumentDtos;
         }
 
+        [HttpGet("{fileId}")]
+        // GET - /campaigns/{campaignId}/references/{fileId}
+        public async Task<ActionResult<CampaignDocumentDto>> GetReferenceDocumentById(
+            [FromRoute] int campaignId,
+            [FromRoute] int fileId)
+        {
+            var campaignExists = await _context.Campaigns.AnyAsync(c => c.CampaignId == campaignId);
+            var documentExists = await _context.ReferenceDocuments.AnyAsync(r => r.FileId == fileId);
+
+            var referenceDocument = await _context.ReferenceDocuments
+                .FirstOrDefaultAsync(r => r.FileId == fileId && r.CampaignId == campaignId);
+
+            if (referenceDocument is null)
+                return NotFound($"File Id {fileId} for Campaign {campaignId} not found.");
+
+            return Ok(referenceDocument);
+        }
+
         [HttpPost]
         // POST - /campaigns/{campaignId}/references
         public async Task<ActionResult> AddReferenceDocument(
@@ -81,25 +99,55 @@ namespace TabletopNote.API.Controllers
             );
         }
 
-        // TODO - update ReferenceDocument
-        [HttpPut]
+        [HttpPut("{fileId}")]
         // PUT - /campaigns/{campaignId}/references/{fileId}
-        public async Task<ActionResult> UpdateCampaignDocument(
+        public async Task<ActionResult> UpdateReferenceDocument(
             [FromRoute] int campaignId,
             [FromRoute] int fileId,
             [FromBody] ReferenceDocumentUpdateDto referenceToUpdate)
         {
-            throw new NotImplementedException();
+            if (referenceToUpdate is null) return BadRequest("Request body is required.");
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            var campaignExists = await _context.Campaigns.AnyAsync(c => c.CampaignId == campaignId);
+            var referenceExists = await _context.ReferenceDocuments.AnyAsync(r => r.FileId == fileId);
+
+            var referenceDocument = await _context.ReferenceDocuments
+                .FirstOrDefaultAsync(r => r.FileId == fileId && r.CampaignId == campaignId);
+
+            if (referenceDocument is null)
+                return NotFound($"Reference {fileId} for Campaign {campaignId} not found.");
+
+            referenceDocument.ReferenceFileName = referenceToUpdate.ReferenceFileName;
+            referenceDocument.FileDescription = referenceToUpdate.FileDescription;
+            referenceDocument.FilePath = referenceToUpdate.FilePath;
+            referenceDocument.Url = referenceToUpdate.Url;
+            referenceDocument.IsGMVisibleOnly = referenceToUpdate.IsGMVisibleOnly;
+
+            await _context.SaveChangesAsync();
+
+            return NoContent();
         }
 
-        // TODO - delete ReferenceDocument
-        [HttpDelete]
-        // Delete - /campaigns/{campaignId}/references/{fileId}
-        public async Task<ActionResult> DeleteCampaignDocument(
-            [FromRoute] int campaignId,
-            [FromRoute] int fileId)
+        [HttpDelete("{fileId}")]
+        // DELETE - /campaigns/{campaignId}/references/{fileId}
+        public async Task<ActionResult> DeleteReferenceDocument(
+             [FromRoute] int campaignId,
+             [FromRoute] int fileId)
         {
-            throw new NotImplementedException();
+            var campaignExists = await _context.Campaigns.AnyAsync(c => c.CampaignId == campaignId);
+            var referenceExists = await _context.ReferenceDocuments.AnyAsync(r => r.FileId == fileId);
+
+            var referenceDocument = await _context.ReferenceDocuments
+                .FirstOrDefaultAsync(r => r.FileId == fileId && r.CampaignId == campaignId);
+
+            if (referenceDocument is null)
+                return NotFound($"Reference {fileId} for Campaign {campaignId} not found.");
+
+            _context.ReferenceDocuments.Remove(referenceDocument);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
         }
 
     }

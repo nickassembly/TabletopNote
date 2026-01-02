@@ -2,7 +2,7 @@
 
 namespace TabletopNote.API.Dtos
 {
-    public class CampaignEventUpdateDto
+    public class CalendarEventUpdateDto
     {
         [Required]
         [MinLength(3, ErrorMessage = "Event name must be at least 3 characters long.")]

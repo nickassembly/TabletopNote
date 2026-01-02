@@ -44,6 +44,24 @@ namespace TabletopNote.API.Controllers
             return calendarEventDtos;
         }
 
+        [HttpGet("{calendarEventId}")]
+        // GET - /campaigns/{campaignId}/events/{calendarEventId}
+        public async Task<ActionResult<CampaignDocumentDto>> GetReferenceDocumentById(
+            [FromRoute] int campaignId,
+            [FromRoute] int calendarEventId)
+        {
+            var campaignExists = await _context.Campaigns.AnyAsync(c => c.CampaignId == campaignId);
+            var eventExists = await _context.CalendarEvents.AnyAsync(e => e.CalendarEventId == calendarEventId);
+
+            var calendarEvent = await _context.CalendarEvents
+                .FirstOrDefaultAsync(e => e.CalendarEventId == calendarEventId && e.CampaignId == campaignId);
+
+            if (calendarEvent is null)
+                return NotFound($"Event {calendarEventId} for Campaign {campaignId} not found.");
+
+            return Ok(calendarEvent);
+        }
+
         [HttpPost]
         // POST - /campaigns/{campaignId}/events
         public async Task<ActionResult> AddCalendarEvent(
@@ -79,25 +97,55 @@ namespace TabletopNote.API.Controllers
             );
         }
 
-        // TODO - update calendar event
-        [HttpPut]
+        [HttpPut("{calendarEventId}")]
         // PUT - /campaigns/{campaignId}/events/{calendarEventId}
-        public async Task<ActionResult> UpdateCampaignDocument(
-            [FromRoute] int campaignId,
-            [FromRoute] int calendarEventId,
-            [FromBody] CampaignEventUpdateDto eventToUpdate)
+        public async Task<ActionResult> UpdateCalendarEvent(
+             [FromRoute] int campaignId,
+             [FromRoute] int calendarEventId,
+             [FromBody] CalendarEventUpdateDto eventToUpdate)
         {
-            throw new NotImplementedException();
+            if (eventToUpdate is null) return BadRequest("Request body is required.");
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            var campaignExists = await _context.Campaigns.AnyAsync(c => c.CampaignId == campaignId);
+            var eventExists = await _context.CalendarEvents.AnyAsync(e => e.CalendarEventId == calendarEventId);
+
+            var calendarEvent = await _context.CalendarEvents
+                .FirstOrDefaultAsync(e => e.CalendarEventId == calendarEventId && e.CampaignId == campaignId);
+
+            if (calendarEvent is null)
+                return NotFound($"Event {calendarEventId} for Campaign {campaignId} not found.");
+
+            calendarEvent.EventName = eventToUpdate.EventName;
+            calendarEvent.EventDescription = eventToUpdate.EventDescription;
+            calendarEvent.EventStartDate = eventToUpdate.EventStartDate;
+            calendarEvent.EventEndDate = eventToUpdate.EventEndDate;
+            calendarEvent.IsGMVisibleOnly = eventToUpdate.IsGMVisibleOnly;
+
+            await _context.SaveChangesAsync();
+
+            return NoContent();
         }
 
-        // TODO - delete calendar event
-        [HttpDelete]
-        // Delete - /campaigns/{campaignId}/events/{calendarEventId}
-        public async Task<ActionResult> DeleteCampaignDocument(
-            [FromRoute] int campaignId,
-            [FromRoute] int calendarEventId)
+        [HttpDelete("{calendarEventId}")]
+        // DELETE - /campaigns/{campaignId}/events/{calendarEventId}
+        public async Task<ActionResult> DeleteCalendarEvent(
+              [FromRoute] int campaignId,
+              [FromRoute] int calendarEventId)
         {
-            throw new NotImplementedException();
+            var campaignExists = await _context.Campaigns.AnyAsync(c => c.CampaignId == campaignId);
+            var eventExists = await _context.CalendarEvents.AnyAsync(e => e.CalendarEventId == calendarEventId);
+
+            var calendarEvent = await _context.CalendarEvents
+                .FirstOrDefaultAsync(e => e.CalendarEventId == calendarEventId && e.CampaignId == campaignId);
+
+            if (calendarEvent is null)
+                return NotFound($"Event {calendarEventId} for Campaign {campaignId} not found.");
+
+            _context.CalendarEvents.Remove(calendarEvent);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
         }
 
     }
