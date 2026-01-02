@@ -2,7 +2,9 @@
 
 <PageTitle>Campaigns</PageTitle>
 
-<button class="btn btn-primary" @onclick="AddCampaign">Add New Campaign</button>
+<MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="AddCampaign">Add New Campaign</MudButton>
+
+<p>@testMessage</p>
 
 <h1>Current Campaigns</h1>
 
@@ -10,9 +12,10 @@ All notes, documents, reference files, and calendar events are grouped under a s
 
 
 @code {
-    
+    private string testMessage = "";
+
     private void AddCampaign()
     {
-
+        testMessage = "add campaign clicked mudblazor";
     }
 }
