@@ -1,8 +1,8 @@
 ﻿using TabletopNote.Core.Models;
 
-namespace TabletopNote.API.Dtos
+namespace TabletopNote.UI.ViewModels
 {
-    public class CampaignDocumentDto
+    public class CampaignDocumentVM
     {
         public int DocumentId { get; set; }
         public string DocumentName { get; set; } = string.Empty;
@@ -10,7 +10,5 @@ namespace TabletopNote.API.Dtos
         public DocumentContentType DocumentContentType { get; set; }
         public string? DocumentContent { get; set; }
         public bool IsGMVisibleOnly { get; set; }
-        public DateTime DocumentCreatedAt { get; set; }
-        public DateTime DocumentUpdatedAt { get; set; }
     }
 }

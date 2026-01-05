@@ -4,6 +4,7 @@ using TabletopNote.API.Dtos;
 using TabletopNote.Core.Models;
 using TabletopNote.Data;
 using TabletopNote.Data.Entities;
+using TabletopNote.Shared;
 
 namespace TabletopNote.API.Controllers
 {
@@ -20,10 +21,11 @@ namespace TabletopNote.API.Controllers
 
         [HttpGet]
         // GET - /campaigns/{campaignId}/documents
-        public async Task<ActionResult<List<CampaignDocumentDto>>> GetAllCampaignDocuments([FromRoute] int campaignId)
+        public async Task<ActionResult<DocumentsByCampaignDto>> GetAllCampaignDocuments([FromRoute] int campaignId)
         {
-            var campaignExists = await _context.Campaigns.AnyAsync(c => c.CampaignId == campaignId);
-            if (!campaignExists)
+            var campaign = await _context.Campaigns.FirstOrDefaultAsync(c => c.CampaignId == campaignId);
+
+            if (campaign == null)
                 return NotFound($"Campaign {campaignId} does not exist.");
 
             var campaignDocuments = await _context.CampaignDocuments.Where(cd => cd.CampaignId == campaignId).ToListAsync();
@@ -46,7 +48,14 @@ namespace TabletopNote.API.Controllers
                 });
             }
 
-            return campaignDocumentDtos;
+            var documentsByCampaign = new DocumentsByCampaignDto
+            {
+                CampaignId = campaignId,
+                CampaignName = campaign.CampaignName,
+                CampaignDocuments = campaignDocumentDtos
+            };
+
+            return documentsByCampaign;
         }
 
         [HttpGet("{documentId}")]

@@ -1,15 +1,58 @@
-﻿@page "/documents"
+﻿@* @page "/{campaignId:int}/documents" *@
+@page "/documents"
+@using TabletopNote.Shared
+@using TabletopNote.UI.Clients
+@using TabletopNote.UI.Mappings
+@using TabletopNote.UI.ViewModels
+@inject DocumentsApiClient DocumentsApi
 
 <PageTitle>Documents</PageTitle>
 
-<h1>Documents</h1>
+<MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="AddDocument">New Document</MudButton>
 
-<button class="btn btn-primary" @onclick="AddDocument">Add Document</button>
+<h1>Current Documents</h1>
+
+All documents for @State.Page?.CampaignName are listed below. Edit any of these existing documents, or create a new document for this campaign.
+
+@if (State.Page is null)
+{
+    <p>Loading…</p>
+}
+else
+{
+    <p>
+        This is a list of documents for
+        <strong>@State.Page.CampaignName</strong>
+    </p>
+
+    @foreach (var document in State.Page.CampaignDocuments)
+    {
+        <div>@document.DocumentName</div>
+    }
+}
+
 
 @code {
 
     private void AddDocument()
     {
 
+    }
+
+    // [Parameter]
+    // public int CampaignId { get; set; }
+
+    private readonly DocumentPageState State = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var dto = await DocumentsApi.GetAllCampaignDocuments(4);
+
+        State.Page = new DocumentsByCampaignVM
+        {
+            CampaignId = dto.CampaignId,
+            CampaignName = dto.CampaignName,
+            CampaignDocuments = dto.CampaignDocuments.Select(cd => cd.ToViewModel()).ToList()
+        };
     }
 }

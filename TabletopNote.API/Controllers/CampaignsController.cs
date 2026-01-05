@@ -20,11 +20,64 @@ namespace TabletopNote.API.Controllers
 
         // TODO ** All controllers need to wrap all requests in Try-Catch
         // Possibly include an error handling middleware layer, or use generic error handling for now
+
         [HttpGet]
         // GET - /campaigns
-        public async Task<ActionResult<List<CampaignEntity>>> GetAllCampaigns()
+        public async Task<ActionResult<List<CampaignDto>>> GetAllCampaigns()
         {
-            return await _context.Campaigns.ToListAsync();
+            var campaigns = await _context.Campaigns
+                           .Include(c => c.CampaignDocuments)
+                           .Include(c => c.CalendarEvents)
+                           .Include(c => c.ReferenceDocuments)
+                           .ToListAsync();
+
+            var allCampaigns = new List<CampaignDto>();
+
+            foreach (var campaign in campaigns)
+            {
+                var campaignDto = new CampaignDto
+                {
+                    CampaignId = campaign.CampaignId,
+                    CampaignName = campaign.CampaignName,
+                    CampaignDescription = campaign.CampaignDescription,
+                    CampaignDocuments = campaign.CampaignDocuments
+                    .Select(d => new CampaignDocumentDto
+                    {
+                        DocumentId = d.DocumentId,
+                        DocumentName = d.DocumentName,
+                        DocumentDescription = d.DocumentDescription,
+                        DocumentContentType = (DocumentContentType)d.DocumentContentType,
+                        DocumentContent = d.DocumentContent,
+                        IsGMVisibleOnly = d.IsGMVisibleOnly,
+                        DocumentCreatedAt = d.DocumentCreatedAt,
+                        DocumentUpdatedAt = d.DocumentUpdatedAt
+                    }).ToList(),
+                    ReferenceDocuments = campaign.ReferenceDocuments
+                    .Select(r => new ReferenceDocumentDto
+                    {
+                        FileId = r.FileId,
+                        ReferenceFileName = r.ReferenceFileName,
+                        FileDescription = r.FileDescription,
+                        FilePath = r.FilePath,
+                        Url = r.Url,
+                        IsGMVisibleOnly = r.IsGMVisibleOnly
+                    }).ToList(),
+                    CalendarEvents = campaign.CalendarEvents
+                    .Select(e => new CalendarEventDto
+                    {
+                        CalendarEventId = e.CalendarEventId,
+                        EventName = e.EventName,
+                        EventDescription = e.EventDescription,
+                        EventStartDate = e.EventStartDate,
+                        EventEndDate = e.EventEndDate,
+                        IsGMVisibleOnly = e.IsGMVisibleOnly
+                    }).ToList()
+                };
+
+                allCampaigns.Add(campaignDto);
+            }
+
+            return allCampaigns;
         }
 
         [HttpGet("{id}")]

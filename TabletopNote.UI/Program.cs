@@ -1,11 +1,16 @@
-using TabletopNote.UI.Components;
 using MudBlazor.Services;
-
+using TabletopNote.UI.Clients;
+using TabletopNote.UI.Components;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+builder.Services.AddHttpClient<DocumentsApiClient>(client =>
+{
+    client.BaseAddress = new Uri("https://localhost:7108/");
+});
 
 builder.Services.AddMudServices();
 

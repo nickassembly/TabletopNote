@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\TableNote.Shared\TableNote.Shared.csproj" />
     <ProjectReference Include="..\TabletopNote.Core\TabletopNote.Core.csproj" />
     <ProjectReference Include="..\TabletopNote.Data\TabletopNote.Data.csproj" />
   </ItemGroup>

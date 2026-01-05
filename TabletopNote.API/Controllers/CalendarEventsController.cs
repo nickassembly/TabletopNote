@@ -19,10 +19,11 @@ namespace TabletopNote.API.Controllers
 
         [HttpGet]
         // GET - /campaigns/{campaignId}/events
-        public async Task<ActionResult<List<CalendarEventDto>>> GetAllCalendarEvent([FromRoute] int campaignId)
+        public async Task<ActionResult<EventsByCampaignDto>> GetAllCalendarEvent([FromRoute] int campaignId)
         {
-            var campaignExists = await _context.Campaigns.AnyAsync(c => c.CampaignId == campaignId);
-            if (!campaignExists)
+            var campaign = await _context.Campaigns.FirstOrDefaultAsync(c => c.CampaignId == campaignId);
+
+            if (campaign == null)
                 return NotFound($"Campaign {campaignId} does not exist.");
 
             var calendarEvents = await _context.CalendarEvents.Where(cd => cd.CampaignId == campaignId).ToListAsync();
@@ -41,7 +42,15 @@ namespace TabletopNote.API.Controllers
                     IsGMVisibleOnly = calendarEvent.IsGMVisibleOnly
                 });
             }
-            return calendarEventDtos;
+
+            var eventsByCampaign = new EventsByCampaignDto
+            {
+                CampaignId = campaignId,
+                CampaignName = campaign.CampaignName,
+                CalendarEvents = calendarEventDtos
+            };
+
+            return eventsByCampaign;
         }
 
         [HttpGet("{calendarEventId}")]

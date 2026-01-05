@@ -2,9 +2,14 @@
 
 <PageTitle>Events</PageTitle>
 
+<PageTitle>References</PageTitle>
+
+<MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="AddEvent">Create Event</MudButton>
+
 <h1>Campaign Events</h1>
 
-<button class="btn btn-primary" @onclick="AddEvent">New Event</button>
+Listed below are the important dates for the {CampaignName} campaign. Calendar events can be updated or removed from this page.
+
 
 @code {
     private void AddEvent()

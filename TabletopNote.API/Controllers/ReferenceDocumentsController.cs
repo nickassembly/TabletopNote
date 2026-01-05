@@ -20,10 +20,11 @@ namespace TabletopNote.API.Controllers
 
         [HttpGet]
         // GET - /campaigns/{campaignId}/references
-        public async Task<ActionResult<List<ReferenceDocumentDto>>> GetAllReferenceDocuments([FromRoute] int campaignId)
+        public async Task<ActionResult<ReferencesByCampaignDto>> GetAllReferenceDocuments([FromRoute] int campaignId)
         {
-            var campaignExists = await _context.Campaigns.AnyAsync(c => c.CampaignId == campaignId);
-            if (!campaignExists)
+            var campaign = await _context.Campaigns.FirstOrDefaultAsync(c => c.CampaignId == campaignId);
+
+            if (campaign == null)
                 return NotFound($"Campaign {campaignId} does not exist.");
 
             var referenceDocuments = await _context.ReferenceDocuments.Where(cd => cd.CampaignId == campaignId).ToListAsync();
@@ -43,7 +44,14 @@ namespace TabletopNote.API.Controllers
                 });
             }
 
-            return referenceDocumentDtos;
+            var referenceByCampaign = new ReferencesByCampaignDto
+            {
+                CampaignId = campaignId,
+                CampaignName = campaign.CampaignName,
+                ReferenceDocuments = referenceDocumentDtos
+            };
+
+            return referenceByCampaign;
         }
 
         [HttpGet("{fileId}")]
