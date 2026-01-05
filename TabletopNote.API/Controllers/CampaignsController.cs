@@ -18,6 +18,8 @@ namespace TabletopNote.API.Controllers
             _context = context;
         }
 
+        // TODO ** All controllers need to wrap all requests in Try-Catch
+        // Possibly include an error handling middleware layer, or use generic error handling for now
         [HttpGet]
         // GET - /campaigns
         public async Task<ActionResult<List<CampaignEntity>>> GetAllCampaigns()
