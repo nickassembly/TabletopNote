@@ -1,0 +1,72 @@
+﻿@page "/campaigns/{campaignId:int}"
+@using TabletopNote.UI.Clients
+@using TabletopNote.UI.ViewModels
+@inject DocumentsApiClient DocumentsApi
+@inject NavigationManager NavigationManager
+
+
+<!-- Side Panel -->
+<MudDrawer Open="true" Elevation="1" Width="240px">
+    <MudNavMenu Dense="true">
+        <MudNavLink Href="@($"/campaigns/{CampaignId}/documents")"
+                    Icon="@Icons.Material.Filled.Description"
+                    Match="NavLinkMatch.All">
+            Documents
+        </MudNavLink>
+
+        <MudNavLink Href="@($"/campaigns/{CampaignId}/references")"
+                    Icon="@Icons.Material.Filled.Book"
+                    Match="NavLinkMatch.All">
+            References
+        </MudNavLink>
+
+        <MudNavLink Href="@($"/campaigns/{CampaignId}/events")"
+                    Icon="@Icons.Material.Filled.Event"
+                    Match="NavLinkMatch.All">
+            Calendar Events
+        </MudNavLink>
+    </MudNavMenu>
+</MudDrawer>
+
+<!-- Main Content -->
+<MudMainContent Class="pa-6">
+    @if (Campaign == null)
+    {
+        <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+    }
+    else
+    {
+        <MudStack Spacing="2">
+            <MudText Typo="Typo.h4">
+                <MudIcon Icon="@Icons.Material.Filled.MenuBook" Class="me-2" />
+                @Campaign.CampaignName
+            </MudText>
+            <MudText Typo="Typo.body1">
+                @Campaign.CampaignDescription
+            </MudText>
+        </MudStack>
+    }
+</MudMainContent>
+
+
+    @code {
+    [Parameter]
+    public int CampaignId { get; set; }
+
+    CampaignVM Campaign { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var campaignDto = await DocumentsApi.GetCampaignById(CampaignId);
+
+        Campaign = new CampaignVM
+        {
+            CampaignId = campaignDto.CampaignId,
+            CampaignName = campaignDto.CampaignName,
+            CampaignDescription = campaignDto.CampaignDescription,
+            CampaignDocuments = campaignDto.CampaignDocuments.ToList(),
+            ReferenceDocuments = campaignDto.ReferenceDocuments.ToList(),
+            CalendarEvents = campaignDto.CalendarEvents.ToList()
+        };
+    }
+}

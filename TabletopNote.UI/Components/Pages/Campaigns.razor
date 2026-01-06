@@ -1,19 +1,117 @@
 ﻿@page "/"
+@using TabletopNote.Shared
+@using TabletopNote.UI.Clients
+@using TabletopNote.UI.Mappings
+@using TabletopNote.UI.ViewModels
+@inject DocumentsApiClient DocumentsApi
+@inject NavigationManager NavigationManager
 
-<PageTitle>Campaigns</PageTitle>
+<!-- Side Panel -->
+<MudDrawer Open="true"
+           Variant="DrawerVariant.Persistent"
+           Elevation="1"
+           Width="240px">
 
-<MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="AddCampaign">New Campaign</MudButton>
+    <MudStack Class="pa-4" Spacing="2">
+        <MudButton StartIcon="@Icons.Material.Filled.Add"
+                   Color="Color.Primary"
+                   Variant="Variant.Filled"
+                   OnClick="AddCampaign">
+            New Campaign
+        </MudButton>
+    </MudStack>
+</MudDrawer>
 
-<h1>Current Campaigns</h1>
+<!-- Main Content -->
+<MudMainContent>
+    <MudContainer MaxWidth="MaxWidth.False" Class="pa-6">
+        <MudStack Direction="Column" AlignItems=AlignItems.Center Spacing="1" Class="mb-4">
+            <MudIcon Icon="@Icons.Material.Filled.Book" Size="Size.Large" />
+            <MudText Typo="Typo.h4">
+                Campaigns
+            </MudText>
+        </MudStack>
 
-All notes, documents, reference files, and calendar events are grouped under a specific campaign. 
+        <MudGrid Spacing="3">
+            @foreach (var campaign in CampaignList)
+            {
+                <MudItem xs="12" sm="6" md="4" lg="3">
+                    <MudCard Class="campaign-card"
+                             Elevation="3"
+                             Style="cursor:pointer"
+                             @onclick="() => OpenCampaign(campaign.CampaignId)">
+
+                        <MudCardHeader>
+                            <MudText Typo="Typo.h5">
+                                @campaign.CampaignName
+                            </MudText>
+                        </MudCardHeader>
+
+                        <MudCardContent>
+                            <MudText Typo="Typo.body2" Color="Color.Secondary">
+                                @campaign.CampaignDescription
+                            </MudText>
+                        </MudCardContent>
+
+                        <MudCardActions Class="justify-end">
+                            <MudIconButton Icon="@Icons.Material.Filled.Edit"
+                                           Size="Size.Small"
+                                           StopPropagation="true"
+                                           OnClick="() => EditCampaign(campaign.CampaignId)" />
+
+                            <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                           Size="Size.Small"
+                                           Color="Color.Error"
+                                           StopPropagation="true"
+                                           OnClick="() => DeleteCampaign(campaign.CampaignId)" />
+                        </MudCardActions>
+                    </MudCard>
+                </MudItem>
+            }
+        </MudGrid>
+    </MudContainer>
+</MudMainContent>
 
 
 @code {
-    private string testMessage = "";
+    List<CampaignVM> CampaignList = new();
 
-    private void AddCampaign()
+    protected override async Task OnInitializedAsync()
     {
-        testMessage = "add campaign clicked mudblazor";
+        List<CampaignDto> campaignDtos = await DocumentsApi.GetAllCampaigns();
+
+        foreach (var campaignDto in campaignDtos)
+        {
+            CampaignList.Add(new CampaignVM
+            {
+                CampaignId = campaignDto.CampaignId,
+                CampaignName = campaignDto.CampaignName,
+                CampaignDescription = campaignDto.CampaignDescription,
+                CampaignDocuments = campaignDto.CampaignDocuments.ToList(),
+                ReferenceDocuments = campaignDto.ReferenceDocuments.ToList(),
+                CalendarEvents = campaignDto.CalendarEvents.ToList()
+            });
+        }
+    }
+
+    void AddCampaign()
+    {
+        // Open dialog or navigate to create page
+    }
+
+    void OpenCampaign(int campaignId)
+    {
+        NavigationManager.NavigateTo($"/campaigns/{campaignId}");
+    }
+
+    void EditCampaign(int campaignId)
+    {
+
+    }
+
+    void DeleteCampaign(int campaignId)
+    {
+
     }
 }
+

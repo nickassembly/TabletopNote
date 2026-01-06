@@ -58,3 +58,9 @@ h1:focus {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
     text-align: start;
 }
+
+.campaign-card:hover {
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6);
+    transform: translateY(-2px);
+    transition: all 0.15s ease-in-out;
+}

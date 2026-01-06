@@ -11,14 +11,25 @@ namespace TabletopNote.UI.Clients
             _http = http;
         }
 
+        public async Task<List<CampaignDto>> GetAllCampaigns()
+        {
+            return await _http.GetFromJsonAsync<List<CampaignDto>>(
+                $"/campaigns"
+            ) ?? throw new InvalidOperationException("No response");
+        }
+
+        public async Task<CampaignDto> GetCampaignById(int campaignId)
+        {
+            return await _http.GetFromJsonAsync<CampaignDto>(
+                $"/campaigns/{campaignId}"
+            ) ?? throw new InvalidOperationException("No response");
+        }
+
         public async Task<DocumentsByCampaignDto> GetAllCampaignDocuments(int campaignId)
         {
-            var test = await _http.GetFromJsonAsync<DocumentsByCampaignDto>($"campaigns/{campaignId}/documents");
-            //return await _http.GetFromJsonAsync<DocumentsByCampaignDto>(
-            //    $"campaigns/{campaignId}/documents"
-            //) ?? throw new InvalidOperationException("No response");
-
-                return test;
+            return await _http.GetFromJsonAsync<DocumentsByCampaignDto>(
+                $"campaigns/{campaignId}/documents"
+            ) ?? throw new InvalidOperationException("No response");
         }
     }
 }

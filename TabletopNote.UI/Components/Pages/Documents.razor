@@ -1,5 +1,4 @@
-﻿@* @page "/{campaignId:int}/documents" *@
-@page "/documents"
+﻿@page "/campaigns/{campaignId:int}/documents"
 @using TabletopNote.Shared
 @using TabletopNote.UI.Clients
 @using TabletopNote.UI.Mappings
@@ -39,14 +38,14 @@ else
 
     }
 
-    // [Parameter]
-    // public int CampaignId { get; set; }
+    [Parameter]
+    public int CampaignId { get; set; }
 
     private readonly DocumentPageState State = new();
 
     protected override async Task OnInitializedAsync()
     {
-        var dto = await DocumentsApi.GetAllCampaignDocuments(4);
+        var dto = await DocumentsApi.GetAllCampaignDocuments(CampaignId);
 
         State.Page = new DocumentsByCampaignVM
         {
