@@ -1,17 +1,60 @@
-﻿@page "/references"
+﻿@page "/campaigns/{campaignId:int}/references"
+@using TabletopNote.Shared
+@using TabletopNote.UI.Clients
+@using TabletopNote.UI.Mappings
+@using TabletopNote.UI.ViewModels
+@inject DocumentsApiClient DocumentsApi
 
 <PageTitle>References</PageTitle>
 
-<MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="AddReference">Attach File</MudButton>
+<MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="AddDocument">New Reference</MudButton>
 
-<h1>Current References</h1>
+<h1>File References</h1>
 
-Below are reference files that have been attached to {CampaignName}. References can be added or removed for this specific campaign.
+All documents for @State.Page?.CampaignName are listed below. Edit any of these existing reference files, or attach a new reference file.
+
+@if (State.Page is null)
+{
+    <p>Loading…</p>
+}
+else
+{
+    <p>
+        This is a list of references for
+        <strong>@State.Page.CampaignName</strong>
+    </p>
+
+    @foreach (var reference in State.Page.ReferenceDocuments)
+    {
+        <div>@reference.ReferenceFileName</div>
+        <div>@reference.FileDescription</div>
+        <div>@reference.FilePath</div>
+        <div>@reference.Url</div>
+    }
+}
 
 
 @code {
-    private void AddReference()
+
+    private void AddDocument()
     {
 
+    }
+
+    [Parameter]
+    public int CampaignId { get; set; }
+
+    private readonly ReferencePageState State = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var dto = await DocumentsApi.GetAllReferenceDocuments(CampaignId);
+
+        State.Page = new ReferencesByCampaignVM
+        {
+            CampaignId = dto.CampaignId,
+            CampaignName = dto.CampaignName,
+            ReferenceDocuments = dto.ReferenceDocuments.Select(rd => rd.ToViewModel()).ToList()
+        };
     }
 }

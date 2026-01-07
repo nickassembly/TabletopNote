@@ -27,6 +27,9 @@ else
     @foreach (var document in State.Page.CampaignDocuments)
     {
         <div>@document.DocumentName</div>
+        <div>@document.DocumentDescription</div>
+        <div>@document.DocumentContentType</div>
+        <div>@document.DocumentContent</div>
     }
 }
 

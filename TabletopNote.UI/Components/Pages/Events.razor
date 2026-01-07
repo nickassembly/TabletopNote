@@ -1,20 +1,61 @@
-﻿@page "/events"
+﻿@page "/campaigns/{campaignId:int}/events"
+@using TabletopNote.Shared
+@using TabletopNote.UI.Clients
+@using TabletopNote.UI.Mappings
+@using TabletopNote.UI.ViewModels
+@inject DocumentsApiClient DocumentsApi
 
 <PageTitle>Events</PageTitle>
 
-<PageTitle>References</PageTitle>
+<MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="AddDocument">Add New Event</MudButton>
 
-<MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="AddEvent">Create Event</MudButton>
+<h1>Important Events</h1>
 
-<h1>Campaign Events</h1>
+All events for @State.Page?.CampaignName are listed below. Edit any of these existing calendar events, or add new dates.
 
-Listed below are the important dates for the {CampaignName} campaign. Calendar events can be updated or removed from this page.
+@if (State.Page is null)
+{
+    <p>Loading…</p>
+}
+else
+{
+    <p>
+        This is a list of events for
+        <strong>@State.Page.CampaignName</strong>
+    </p>
 
-
-@code {
-    private void AddEvent()
+    @foreach (var calendarEvent in State.Page.CalendarEvents)
     {
+        <div>@calendarEvent.EventName</div>
+        <div>@calendarEvent.EventDescription</div>
+        <div>@calendarEvent.EventStartDate</div>
+        <div>@calendarEvent.EventEndDate</div>
 
     }
 }
 
+
+@code {
+
+    private void AddDocument()
+    {
+
+    }
+
+    [Parameter]
+    public int CampaignId { get; set; }
+
+    private readonly EventPageState State = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var dto = await DocumentsApi.GetAllCalendarEvents(CampaignId);
+
+        State.Page = new EventsByCampaignVM
+        {
+            CampaignId = dto.CampaignId,
+            CampaignName = dto.CampaignName,
+            CalendarEvents = dto.CalendarEvents.Select(e => e.ToViewModel()).ToList()
+        };
+    }
+}

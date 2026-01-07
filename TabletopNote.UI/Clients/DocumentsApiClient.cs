@@ -1,4 +1,5 @@
-﻿using TabletopNote.Shared;
+﻿using TabletopNote.API.Dtos;
+using TabletopNote.Shared;
 
 namespace TabletopNote.UI.Clients
 {
@@ -29,6 +30,20 @@ namespace TabletopNote.UI.Clients
         {
             return await _http.GetFromJsonAsync<DocumentsByCampaignDto>(
                 $"campaigns/{campaignId}/documents"
+            ) ?? throw new InvalidOperationException("No response");
+        }
+
+        public async Task<ReferencesByCampaignDto> GetAllReferenceDocuments(int campaignId)
+        {
+            return await _http.GetFromJsonAsync<ReferencesByCampaignDto>(
+                $"campaigns/{campaignId}/references"
+            ) ?? throw new InvalidOperationException("No response");
+        }
+
+        public async Task<EventsByCampaignDto> GetAllCalendarEvents(int campaignId)
+        {
+            return await _http.GetFromJsonAsync<EventsByCampaignDto>(
+                $"campaigns/{campaignId}/events"
             ) ?? throw new InvalidOperationException("No response");
         }
     }
