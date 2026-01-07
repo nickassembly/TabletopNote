@@ -1,0 +1,64 @@
+﻿@using MudBlazor
+@using Microsoft.AspNetCore.Components
+
+<MudStack Row="@IsHorizontal" Spacing="2" Wrap="Wrap.Wrap">
+    @foreach (var section in Sections)
+    {
+        <MudButton Variant="Variant.Filled"
+                   Color="@(section.Color)"
+                   Href="@(section.Href)"
+                   StartIcon="@(section.Icon)"
+                   Size="@ButtonSize"
+                   StartIconSize="@IconSize">
+            @(section.Name)
+        </MudButton>
+    }
+</MudStack>
+
+@code {
+    [Parameter]
+    public int CampaignId { get; set; }
+
+    [Parameter]
+    public bool IsHorizontal { get; set; } = false;
+
+    // New optional parameters for small icons
+    [Parameter]
+    public Size ButtonSize { get; set; } = Size.Medium;
+
+    [Parameter]
+    public Size IconSize { get; set; } = Size.Medium;
+
+    private List<SectionItem> Sections => new()
+    {
+        new SectionItem
+        {
+            Name = "Documents",
+            Href = $"/campaigns/{CampaignId}/documents",
+            Icon = Icons.Material.Filled.Description,
+            Color = Color.Primary
+        },
+        new SectionItem
+        {
+            Name = "References",
+            Href = $"/campaigns/{CampaignId}/references",
+            Icon = Icons.Material.Filled.Book,
+            Color = Color.Info
+        },
+        new SectionItem
+        {
+            Name = "Calendar Events",
+            Href = $"/campaigns/{CampaignId}/events",
+            Icon = Icons.Material.Filled.Event,
+            Color = Color.Success
+        }
+    };
+
+    private class SectionItem
+    {
+        public string Name { get; set; } = string.Empty;
+        public string Href { get; set; } = string.Empty;
+        public string Icon { get; set; } = string.Empty;
+        public Color Color { get; set; }
+    }
+}

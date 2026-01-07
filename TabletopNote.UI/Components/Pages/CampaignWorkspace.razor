@@ -1,30 +1,13 @@
-﻿@page "/campaigns/{campaignId:int}"
+﻿@page "/campaigns/{CampaignId:int}"
 @using TabletopNote.UI.Clients
 @using TabletopNote.UI.ViewModels
 @inject DocumentsApiClient DocumentsApi
 @inject NavigationManager NavigationManager
 
-
 <!-- Side Panel -->
-<MudDrawer Open="true" Elevation="1" Width="240px">
-    <MudNavMenu Dense="true">
-        <MudNavLink Href="@($"/campaigns/{CampaignId}/documents")"
-                    Icon="@Icons.Material.Filled.Description"
-                    Match="NavLinkMatch.All">
-            Documents
-        </MudNavLink>
-
-        <MudNavLink Href="@($"/campaigns/{CampaignId}/references")"
-                    Icon="@Icons.Material.Filled.Book"
-                    Match="NavLinkMatch.All">
-            References
-        </MudNavLink>
-
-        <MudNavLink Href="@($"/campaigns/{CampaignId}/events")"
-                    Icon="@Icons.Material.Filled.Event"
-                    Match="NavLinkMatch.All">
-            Calendar Events
-        </MudNavLink>
+<MudDrawer Open="true" Elevation="1" Width="260px" ClipMode="DrawerClipMode.Never">
+    <MudNavMenu Dense="true" Class="pa-2">
+        <CampaignSectionNav CampaignId="@CampaignId" IsHorizontal="false" ButtonSize="Size.Medium" IconSize="Size.Medium" />
     </MudNavMenu>
 </MudDrawer>
 
@@ -36,20 +19,29 @@
     }
     else
     {
-        <MudStack Spacing="2">
-            <MudText Typo="Typo.h4">
-                <MudIcon Icon="@Icons.Material.Filled.MenuBook" Class="me-2" />
-                @Campaign.CampaignName
-            </MudText>
-            <MudText Typo="Typo.body1">
-                @Campaign.CampaignDescription
-            </MudText>
-        </MudStack>
+        <MudPaper Elevation="4" Class="pa-6 mx-auto"
+                  Style="max-width:800px; border-radius:12px; background-color:#1E1E1E;">
+            <MudStack Spacing="3">
+                <MudText Typo="Typo.h3" Color="Color.Primary">
+                    <MudIcon Icon="@Icons.Material.Filled.MenuBook" Class="me-2" />
+                    @Campaign.CampaignName
+                </MudText>
+
+                <MudText Typo="Typo.body1" Color="Color.Secondary">
+                    @Campaign.CampaignDescription
+                </MudText>
+
+                <!-- Quick Nav Buttons for small screens -->
+                <MudHidden Breakpoint="Breakpoint.MdAndUp">
+                    <CampaignSectionNav CampaignId="@CampaignId" IsHorizontal="true" ButtonSize="Size.Small" IconSize="Size.Small" />
+                </MudHidden>
+            </MudStack>
+        </MudPaper>
     }
 </MudMainContent>
 
 
-    @code {
+@code {
     [Parameter]
     public int CampaignId { get; set; }
 

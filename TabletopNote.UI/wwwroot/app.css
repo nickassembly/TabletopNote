@@ -64,3 +64,10 @@ h1:focus {
     transform: translateY(-2px);
     transition: all 0.15s ease-in-out;
 }
+
+.campaign-nav-link:hover,
+.mud-button:hover {
+    opacity: 0.85;
+    transform: translateY(-1px);
+    transition: all 0.15s ease-in-out;
+}
