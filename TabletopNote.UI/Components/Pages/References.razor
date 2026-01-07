@@ -3,35 +3,104 @@
 @using TabletopNote.UI.Clients
 @using TabletopNote.UI.Mappings
 @using TabletopNote.UI.ViewModels
+@using MudBlazor
 @inject DocumentsApiClient DocumentsApi
 
 <PageTitle>References</PageTitle>
 
-<MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="AddDocument">New Reference</MudButton>
+<MudStack Spacing="4">
 
-<h1>File References</h1>
+    <!-- Header -->
+    <MudStack Direction="Row" AlignItems="AlignItems.Center" JustifyContent="SpaceBetween">
+        <MudText Typo="Typo.h4" Color="Color.Info">
+            Attachments &amp; References
+        </MudText>
 
-All documents for @State.Page?.CampaignName are listed below. Edit any of these existing reference files, or attach a new reference file.
+        <MudButton Variant="Variant.Outlined"
+                   Color="Color.Info"
+                   StartIcon="@Icons.Material.Filled.AttachFile"
+                   OnClick="AddDocument">
+            New Reference
+        </MudButton>
+    </MudStack>
 
-@if (State.Page is null)
-{
-    <p>Loading…</p>
-}
-else
-{
-    <p>
-        This is a list of references for
-        <strong>@State.Page.CampaignName</strong>
-    </p>
-
-    @foreach (var reference in State.Page.ReferenceDocuments)
+    @if (State.Page is null)
     {
-        <div>@reference.ReferenceFileName</div>
-        <div>@reference.FileDescription</div>
-        <div>@reference.FilePath</div>
-        <div>@reference.Url</div>
+        <MudProgressCircular Indeterminate="true" Color="Color.Info" />
     }
-}
+    else
+    {
+        <MudGrid Spacing="3">
+            @foreach (var reference in State.Page.ReferenceDocuments)
+            {
+                <MudItem xs="12" sm="6" md="4">
+                    <MudStack AlignItems="AlignItems.Center">
+
+                        <MudPaper Outlined="true"
+                                  Class="pa-4"
+                                  Style="border-radius:12px; display:inline-block;">
+
+                            <MudStack Spacing="2"
+                                      AlignItems="AlignItems.Center"
+                                      Style="text-align:center; min-width:220px;">
+
+                                <!-- Icon + Name -->
+                                <MudStack Direction="Row"
+                                          AlignItems="AlignItems.Center"
+                                          Spacing="1"
+                                          JustifyContent="Center">
+                                    <MudIcon Icon="@GetReferenceIcon(reference)"
+                                             Color="Color.Info"
+                                             Size="Size.Medium" />
+                                    <MudText Typo="Typo.subtitle1">
+                                        @reference.ReferenceFileName
+                                    </MudText>
+                                </MudStack>
+
+                                <!-- Description -->
+                                <MudText Typo="Typo.body2" Color="Color.Secondary">
+                                    @reference.FileDescription
+                                </MudText>
+
+                                <!-- Source Type -->
+                                @if (!string.IsNullOrWhiteSpace(reference.Url))
+                                {
+                                    <MudText Typo="Typo.caption" Color="Color.Info">
+                                        <MudIcon Icon="@Icons.Material.Filled.Link"
+                                                 Size="Size.Small"
+                                                 Class="me-1" />
+                                        External Link
+                                    </MudText>
+                                }
+                                else if (!string.IsNullOrWhiteSpace(reference.FilePath))
+                                {
+                                    <MudText Typo="Typo.caption" Color="Color.Info">
+                                        <MudIcon Icon="@Icons.Material.Filled.AttachFile"
+                                                 Size="Size.Small"
+                                                 Class="me-1" />
+                                        Uploaded File
+                                    </MudText>
+                                }
+
+                                <MudDivider Class="my-2" />
+
+                                <MudButton Variant="Variant.Text"
+                                           Color="Color.Info"
+                                           StartIcon="@Icons.Material.Filled.Edit">
+                                    Update Reference
+                                </MudButton>
+
+                            </MudStack>
+                        </MudPaper>
+
+                    </MudStack>
+                </MudItem>
+
+            }
+        </MudGrid>
+    }
+</MudStack>
+
 
 
 @code {
@@ -57,4 +126,22 @@ else
             ReferenceDocuments = dto.ReferenceDocuments.Select(rd => rd.ToViewModel()).ToList()
         };
     }
+
+    private string GetReferenceIcon(ReferenceDocumentVM reference)
+    {
+        if (!string.IsNullOrWhiteSpace(reference.Url))
+            return Icons.Material.Filled.Link;
+
+        if (!string.IsNullOrWhiteSpace(reference.FilePath))
+            return Icons.Material.Filled.AttachFile;
+
+        return Icons.Material.Filled.InsertDriveFile;
+    }
+
+    private void UpdateReference(int fileId)
+    {
+        // Navigate to update page later
+        // NavigationManager.NavigateTo($"/references/{reference.ReferenceId}/edit");
+    }
+
 }
