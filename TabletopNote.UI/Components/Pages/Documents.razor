@@ -3,44 +3,86 @@
 @using TabletopNote.UI.Clients
 @using TabletopNote.UI.Mappings
 @using TabletopNote.UI.ViewModels
+@using MudBlazor
 @inject DocumentsApiClient DocumentsApi
 
 <PageTitle>Documents</PageTitle>
 
-<MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="AddDocument">New Document</MudButton>
+<MudStack Spacing="4">
 
-<h1>Current Documents</h1>
+    <!-- Header -->
+    <MudStack Direction="Row" AlignItems="AlignItems.Center" JustifyContent="SpaceBetween">
+        <MudText Typo="Typo.h4" Color="Color.Primary">
+            Documents
+        </MudText>
 
-All documents for @State.Page?.CampaignName are listed below. Edit any of these existing documents, or create a new document for this campaign.
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Primary"
+                   StartIcon="@Icons.Material.Filled.Add"
+                   OnClick="AddDocument">
+            New Document
+        </MudButton>
+    </MudStack>
 
-@if (State.Page is null)
-{
-    <p>Loading…</p>
-}
-else
-{
-    <p>
-        This is a list of documents for
-        <strong>@State.Page.CampaignName</strong>
-    </p>
+    <MudText Color="Color.Secondary">
+        All documents for <strong>@State.Page?.CampaignName</strong>
+    </MudText>
 
-    @foreach (var document in State.Page.CampaignDocuments)
+    @if (State.Page is null)
     {
-        <div>@document.DocumentName</div>
-        <div>@document.DocumentDescription</div>
-        <div>@document.DocumentContentType</div>
-        <div>@document.DocumentContent</div>
+        <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
     }
-}
+    else
+    {
+        <MudGrid Spacing="3">
+            @foreach (var document in State.Page.CampaignDocuments)
+            {
+                <MudItem xs="12" sm="6" md="4">
+                    <MudPaper Elevation="3"
+                              Class="pa-4"
+                              Style="height:100%; background-color:#1E1E1E; border-radius:12px;">
 
+                        <MudStack Spacing="2" Style="height:100%;">
+
+                            <!-- Title -->
+                            <MudText Typo="Typo.h6" Color="Color.Primary">
+                                @document.DocumentName
+                            </MudText>
+
+                            <!-- Description -->
+                            <MudText Typo="Typo.body2" Color="Color.Secondary">
+                                @document.DocumentDescription
+                            </MudText>
+
+                            <!-- Content Type -->
+                            <MudStack Direction="Row" AlignItems="AlignItems.Center" Spacing="1">
+                                <MudIcon Icon="@GetContentTypeIcon(document.DocumentContentType.ToString())"
+                                         Color="Color.Info"
+                                         Size="Size.Small" />
+                                <MudText Typo="Typo.caption" Color="Color.Info">
+                                    @document.DocumentContentType
+                                </MudText>
+                            </MudStack>
+
+                            <MudSpacer />
+
+                            <MudButton Variant="Variant.Outlined"
+                                       Color="Color.Primary"
+                                       StartIcon="@Icons.Material.Filled.OpenInNew"
+                                       OnClick="@(() => OpenDocument(document))"
+                                       FullWidth="true">
+                                Open / Edit
+                            </MudButton>
+
+                        </MudStack>
+                    </MudPaper>
+                </MudItem>
+            }
+        </MudGrid>
+    }
+</MudStack>
 
 @code {
-
-    private void AddDocument()
-    {
-
-    }
-
     [Parameter]
     public int CampaignId { get; set; }
 
@@ -57,4 +99,37 @@ else
             CampaignDocuments = dto.CampaignDocuments.Select(cd => cd.ToViewModel()).ToList()
         };
     }
+
+    private void AddDocument()
+    {
+
+    }
+
+    private void OpenSelectedDocument()
+    {
+            
+    }
+
+    private void EditSelectedDocument()
+    {
+            
+    }
+
+    private string GetContentTypeIcon(string contentType)
+    {
+        return contentType?.ToLower() switch
+        {
+            "note" => Icons.Material.Filled.Description,
+            "table" => Icons.Material.Filled.TableChart,
+            _ => Icons.Material.Filled.EventNote
+        };
+    }
+
+    private void OpenDocument(CampaignDocumentVM document)
+    {
+        // Navigate to view/edit page later
+        // Example:
+        // NavigationManager.NavigateTo($"/documents/{document.DocumentId}");
+    }
+
 }

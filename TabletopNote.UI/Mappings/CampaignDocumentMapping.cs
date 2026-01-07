@@ -15,6 +15,8 @@ namespace TabletopNote.UI.Mappings
                 DocumentDescription = dto.DocumentDescription,
                 DocumentContent = dto.DocumentContent,
                 DocumentContentType = dto.DocumentContentType,
+                DocumentCreatedAt = dto.DocumentCreatedAt,
+                DocumentUpdatedAt = dto.DocumentUpdatedAt,
                 IsGMVisibleOnly = dto.IsGMVisibleOnly
             };
         }

@@ -9,6 +9,8 @@ namespace TabletopNote.UI.ViewModels
         public string DocumentDescription { get; set; } = string.Empty;
         public DocumentContentType DocumentContentType { get; set; }
         public string? DocumentContent { get; set; }
+        public DateTime DocumentCreatedAt { get; set; }
+        public DateTime DocumentUpdatedAt { get; set; }
         public bool IsGMVisibleOnly { get; set; }
     }
 }
