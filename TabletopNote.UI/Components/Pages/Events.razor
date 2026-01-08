@@ -28,9 +28,7 @@
 else
 {
     <MudPaper Elevation="3" Class="pa-6 mt-4">
-
         <MudTimeline Reverse="false">
-
             @foreach (var ev in State.Page.CalendarEvents.OrderBy(e => e.EventStartDate))
             {
                 <MudTimelineItem Color="Color.Primary"
@@ -78,7 +76,7 @@ else
                                            Size="Size.Small"
                                            Color="Color.Primary"
                                            StartIcon="@Icons.Material.Filled.Edit"
-                                           OnClick="() => OpenEvent(ev)">
+                                           OnClick="() => UpdateSelectedEvent(ev)">
                                     View / Edit
                                 </MudButton>
                             </MudStack>
@@ -91,12 +89,6 @@ else
 }
 
 @code {
-
-    private void AddEvent()
-    {
-
-    }
-
     [Parameter]
     public int CampaignId { get; set; }
 
@@ -114,6 +106,16 @@ else
         };
     }
 
+    private void AddEvent()
+    {
+
+    }
+
+    private void UpdateSelectedEvent(CalendarEventVM ev)
+    {
+        NavigationManager.NavigateTo($"/campaigns/{CampaignId}/events/{ev.CalendarEventId}");
+    }
+
     private string FormatEventDate(CalendarEventVM ev)
     {
         if (ev.EventEndDate.Date == ev.EventStartDate.Date)
@@ -123,10 +125,4 @@ else
 
         return $"{ev.EventStartDate:MMM dd} – {ev.EventEndDate:MMM dd, yyyy}";
     }
-
-    private void OpenEvent(CalendarEventVM ev)
-    {
-        NavigationManager.NavigateTo($"/campaigns/{CampaignId}/events/{ev.CalendarEventId}");
-    }
-
 }

@@ -5,12 +5,11 @@
 @using TabletopNote.UI.ViewModels
 @using MudBlazor
 @inject DocumentsApiClient DocumentsApi
+@inject NavigationManager NavigationManager
 
 <PageTitle>References</PageTitle>
 
 <MudStack Spacing="4">
-
-    <!-- Header -->
     <MudStack Direction="Row" AlignItems="AlignItems.Center" JustifyContent="SpaceBetween">
         <MudText Typo="Typo.h4" Color="Color.Info">
             Attachments &amp; References
@@ -44,7 +43,6 @@
                                       AlignItems="AlignItems.Center"
                                       Style="text-align:center; min-width:220px;">
 
-                                <!-- Icon + Name -->
                                 <MudStack Direction="Row"
                                           AlignItems="AlignItems.Center"
                                           Spacing="1"
@@ -57,12 +55,10 @@
                                     </MudText>
                                 </MudStack>
 
-                                <!-- Description -->
                                 <MudText Typo="Typo.body2" Color="Color.Secondary">
                                     @reference.FileDescription
                                 </MudText>
 
-                                <!-- Source Type -->
                                 @if (!string.IsNullOrWhiteSpace(reference.Url))
                                 {
                                     <MudText Typo="Typo.caption" Color="Color.Info">
@@ -102,14 +98,7 @@
 </MudStack>
 
 
-
 @code {
-
-    private void AddDocument()
-    {
-
-    }
-
     [Parameter]
     public int CampaignId { get; set; }
 
@@ -127,6 +116,16 @@
         };
     }
 
+    private void AddDocument()
+    {
+
+    }
+
+    private void UpdateSelectedReference(int fileId)
+    {
+        NavigationManager.NavigateTo($"/references/{fileId}/edit");
+    }
+
     private string GetReferenceIcon(ReferenceDocumentVM reference)
     {
         if (!string.IsNullOrWhiteSpace(reference.Url))
@@ -136,12 +135,6 @@
             return Icons.Material.Filled.AttachFile;
 
         return Icons.Material.Filled.InsertDriveFile;
-    }
-
-    private void UpdateReference(int fileId)
-    {
-        // Navigate to update page later
-        // NavigationManager.NavigateTo($"/references/{reference.ReferenceId}/edit");
     }
 
 }

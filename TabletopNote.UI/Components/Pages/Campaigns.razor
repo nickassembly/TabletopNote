@@ -57,7 +57,7 @@
                             <MudIconButton Icon="@Icons.Material.Filled.Edit"
                                            Size="Size.Small"
                                            StopPropagation="true"
-                                           OnClick="() => EditCampaign(campaign.CampaignId)" />
+                                           OnClick="() => EditCampaignInfo(campaign.CampaignId)" />
 
                             <MudIconButton Icon="@Icons.Material.Filled.Delete"
                                            Size="Size.Small"
@@ -96,7 +96,7 @@
 
     void AddCampaign()
     {
-        // Open dialog or navigate to create page
+        
     }
 
     void OpenCampaign(int campaignId)
@@ -104,7 +104,7 @@
         NavigationManager.NavigateTo($"/campaigns/{campaignId}");
     }
 
-    void EditCampaign(int campaignId)
+    void EditCampaignInfo(int campaignId)
     {
 
     }
