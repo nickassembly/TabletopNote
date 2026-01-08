@@ -9,8 +9,6 @@
 <PageTitle>Documents</PageTitle>
 
 <MudStack Spacing="4">
-
-    <!-- Header -->
     <MudStack Direction="Row" AlignItems="AlignItems.Center" JustifyContent="SpaceBetween">
         <MudText Typo="Typo.h4" Color="Color.Primary">
             Documents
@@ -23,10 +21,6 @@
             New Document
         </MudButton>
     </MudStack>
-
-    <MudText Color="Color.Secondary">
-        All documents for <strong>@State.Page?.CampaignName</strong>
-    </MudText>
 
     @if (State.Page is null)
     {

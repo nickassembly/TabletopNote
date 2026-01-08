@@ -4,14 +4,22 @@
 @using TabletopNote.UI.Mappings
 @using TabletopNote.UI.ViewModels
 @inject DocumentsApiClient DocumentsApi
+@inject NavigationManager NavigationManager
 
 <PageTitle>Events</PageTitle>
 
-<MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="AddDocument">Add New Event</MudButton>
+<MudStack Direction="Row" AlignItems="AlignItems.Center" JustifyContent="SpaceBetween">
+    <MudText Typo="Typo.h4" Color="Color.Success">
+        Events of Note
+    </MudText>
 
-<h1>Important Events</h1>
-
-All events for @State.Page?.CampaignName are listed below. Edit any of these existing calendar events, or add new dates.
+    <MudButton Variant="Variant.Filled"
+               Color="Color.Success"
+               StartIcon="@Icons.Material.Filled.Add"
+               OnClick="AddEvent">
+        New Event
+    </MudButton>
+</MudStack>
 
 @if (State.Page is null)
 {
@@ -19,25 +27,72 @@ All events for @State.Page?.CampaignName are listed below. Edit any of these exi
 }
 else
 {
-    <p>
-        This is a list of events for
-        <strong>@State.Page.CampaignName</strong>
-    </p>
+    <MudPaper Elevation="3" Class="pa-6 mt-4">
 
-    @foreach (var calendarEvent in State.Page.CalendarEvents)
-    {
-        <div>@calendarEvent.EventName</div>
-        <div>@calendarEvent.EventDescription</div>
-        <div>@calendarEvent.EventStartDate</div>
-        <div>@calendarEvent.EventEndDate</div>
+        <MudTimeline Reverse="false">
 
-    }
+            @foreach (var ev in State.Page.CalendarEvents.OrderBy(e => e.EventStartDate))
+            {
+                <MudTimelineItem Color="Color.Primary"
+                                 Icon="@Icons.Material.Filled.Event">
+
+                    <ChildContent>
+                        <MudPaper Class="pa-3 timeline-card"
+                                  Elevation="0"
+                                  Outlined="true">
+
+                            <MudStack Direction="Row"
+                                      AlignItems="AlignItems.Center"
+                                      Spacing="1">
+
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                    <MudIcon Icon="@Icons.Material.Filled.Schedule"
+                                             Size="Size.Small"
+                                             Class="me-1" />
+                                    @FormatEventDate(ev)
+                                </MudText>
+
+                                @if (ev.EventEndDate.Date != ev.EventStartDate.Date)
+                                {
+                                    <MudChip T="string"
+                                             Size="Size.Small"
+                                             Color="Color.Info"
+                                             Variant="Variant.Outlined">
+                                        Multi-day
+                                    </MudChip>
+                                }
+                            </MudStack>
+
+                            <MudText Typo="Typo.subtitle1">
+                                @ev.EventName
+                            </MudText>
+
+                            <MudText Typo="Typo.body2" Color="Color.Secondary">
+                                @ev.EventDescription
+                            </MudText>
+
+                            <MudStack Direction="Row"
+                                      Justify="Justify.FlexStart"
+                                      Class="mt-2">
+                                <MudButton Variant="Variant.Text"
+                                           Size="Size.Small"
+                                           Color="Color.Primary"
+                                           StartIcon="@Icons.Material.Filled.Edit"
+                                           OnClick="() => OpenEvent(ev)">
+                                    View / Edit
+                                </MudButton>
+                            </MudStack>
+                        </MudPaper>
+                    </ChildContent>
+                </MudTimelineItem>
+            }
+        </MudTimeline>
+    </MudPaper>
 }
-
 
 @code {
 
-    private void AddDocument()
+    private void AddEvent()
     {
 
     }
@@ -58,4 +113,20 @@ else
             CalendarEvents = dto.CalendarEvents.Select(e => e.ToViewModel()).ToList()
         };
     }
+
+    private string FormatEventDate(CalendarEventVM ev)
+    {
+        if (ev.EventEndDate.Date == ev.EventStartDate.Date)
+        {
+            return ev.EventStartDate.ToString("MMM dd, yyyy");
+        }
+
+        return $"{ev.EventStartDate:MMM dd} – {ev.EventEndDate:MMM dd, yyyy}";
+    }
+
+    private void OpenEvent(CalendarEventVM ev)
+    {
+        NavigationManager.NavigateTo($"/campaigns/{CampaignId}/events/{ev.CalendarEventId}");
+    }
+
 }
