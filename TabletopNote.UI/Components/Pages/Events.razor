@@ -28,7 +28,9 @@
 else
 {
     <MudPaper Elevation="3" Class="pa-6 mt-4">
-        <MudTimeline Reverse="false">
+        <MudTimeline 
+            Reverse="false"
+            Class="centered-timeline">
             @foreach (var ev in State.Page.CalendarEvents.OrderBy(e => e.EventStartDate))
             {
                 <MudTimelineItem Color="Color.Primary"
@@ -70,7 +72,7 @@ else
                             </MudText>
 
                             <MudStack Direction="Row"
-                                      Justify="Justify.FlexStart"
+                                      Justify="Justify.Center"
                                       Class="mt-2">
                                 <MudButton Variant="Variant.Text"
                                            Size="Size.Small"

@@ -86,4 +86,30 @@ h1:focus {
     align-items: flex-start !important;
 }
 
+/* Base timeline layout */
+.centered-timeline {
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+    /* Left-side items: pull them toward the center */
+    .centered-timeline .mud-timeline-item-left {
+        justify-content: flex-end;
+        padding-right: 24px;
+        margin-right: 0;
+    }
+
+    /* Right-side items: pull them toward the center */
+    .centered-timeline .mud-timeline-item-right {
+        justify-content: flex-start;
+        padding-left: 24px;
+        margin-left: 0;
+    }
+
+    /* Prevent content from stretching to screen edges */
+    .centered-timeline .mud-timeline-item-content {
+        max-width: 420px;
+    }
+
+
 
