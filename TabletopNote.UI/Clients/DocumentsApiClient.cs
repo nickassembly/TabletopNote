@@ -102,7 +102,7 @@ namespace TabletopNote.UI.Clients
         public async Task DeleteCampaignDocument(int campaignId, int documentId)
         {
             var response = await _http.DeleteAsync(
-                $"/campaigns/{campaignId}"
+                $"/campaigns/{campaignId}/documents/{documentId}"
             );
 
             if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
