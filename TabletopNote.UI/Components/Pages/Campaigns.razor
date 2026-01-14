@@ -54,11 +54,6 @@
                         </MudCardContent>
 
                         <MudCardActions Class="justify-end">
-                            <MudIconButton Icon="@Icons.Material.Filled.Edit"
-                                           Size="Size.Small"
-                                           StopPropagation="true"
-                                           OnClick="() => EditCampaignInfo(campaign.CampaignId)" />
-
                             <MudIconButton Icon="@Icons.Material.Filled.Delete"
                                            Size="Size.Small"
                                            Color="Color.Error"
@@ -104,14 +99,14 @@
         NavigationManager.NavigateTo($"/campaigns/{campaignId}");
     }
 
-    void EditCampaignInfo(int campaignId)
+    async Task DeleteCampaign(int campaignId)
     {
+        await DocumentsApi.DeleteCampaign(campaignId);
 
-    }
-
-    void DeleteCampaign(int campaignId)
-    {
-
+        var campaign = CampaignList.FirstOrDefault(c => c.CampaignId == campaignId);
+       
+        if (campaign != null)
+            CampaignList.Remove(campaign);
     }
 }
 

@@ -50,6 +50,16 @@ namespace TabletopNote.UI.Clients
             ) ?? throw new InvalidOperationException("No response");
         }
 
+        public async Task DeleteCampaign(int campaignId)
+        {
+            var response = await _http.DeleteAsync(
+                $"/campaigns/{campaignId}"
+            );
+
+            if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+                throw new KeyNotFoundException($"Campaign with ID {campaignId} not found.");
+        }
+
         public async Task<DocumentsByCampaignDto> GetAllCampaignDocuments(int campaignId)
         {
             return await _http.GetFromJsonAsync<DocumentsByCampaignDto>(

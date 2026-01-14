@@ -32,31 +32,21 @@
                     @(IsNewCampaign ? "New Campaign" : Campaign.CampaignName)
                 </MudText>
 
+                <MudTextField Label="Campaign Name"
+                              @bind-Value="Campaign.CampaignName"
+                              Variant="Variant.Outlined"
+                              Required />
 
-                @if (IsNewCampaign)
-                {
-                    <MudTextField Label="Campaign Name"
-                                  @bind-Value="Campaign.CampaignName"
-                                  Variant="Variant.Outlined"
-                                  Required />
+                <MudTextField Label="Description"
+                              @bind-Value="Campaign.CampaignDescription"
+                              Variant="Variant.Outlined"
+                              Lines="4" />
 
-                    <MudTextField Label="Description"
-                                  @bind-Value="Campaign.CampaignDescription"
-                                  Variant="Variant.Outlined"
-                                  Lines="4" />
-
-                    <MudButton Variant="Variant.Filled"
-                               Color="Color.Success"
-                               StartIcon="@Icons.Material.Filled.Save"
-                               OnClick="SaveCampaign">
-                    </MudButton>
-                }
-                else
-                {
-                    <MudText Typo="Typo.body1" Color="Color.Secondary">
-                        @Campaign.CampaignDescription
-                    </MudText>
-                }
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Success"
+                           StartIcon="@Icons.Material.Filled.Save"
+                           OnClick="SaveCampaign">
+                </MudButton>
 
                 <!-- Quick Nav Buttons for small screens -->
                 <MudHidden Breakpoint="Breakpoint.MdAndUp">
@@ -111,9 +101,9 @@
                 CampaignDescription = Campaign.CampaignDescription
             };
 
-            var newCampaign = await DocumentsApi.AddCampaign(campaignToAdd);
+            await DocumentsApi.AddCampaign(campaignToAdd);
 
-            NavigationManager.NavigateTo($"/campaigns/{newCampaign.CampaignId}");
+            NavigationManager.NavigateTo($"/");
         }
         else
         {
@@ -124,6 +114,8 @@
             };
 
             await DocumentsApi.UpdateCampaign(campaignToUpdate, CampaignId);
+
+            NavigationManager.NavigateTo($"/");
         }
     }
 
