@@ -67,6 +67,48 @@ namespace TabletopNote.UI.Clients
             ) ?? throw new InvalidOperationException("No response");
         }
 
+        public async Task<CampaignDocumentDto> GetCampaignDocumentById(int campaignId, int documentId)
+        {
+            return await _http.GetFromJsonAsync<CampaignDocumentDto>(
+                $"/campaigns/{campaignId}/documents/{documentId}"
+            ) ?? throw new InvalidOperationException("No response");
+        }
+
+        public async Task<CampaignDocumentDto> AddCampaignDocument(int campaignId, CampaignDocumentAddDto campaignDocumentToAdd)
+        {
+            var response = await _http.PostAsJsonAsync(
+               $"/campaigns/{campaignId}/documents", campaignDocumentToAdd
+           );
+
+            if (!response.IsSuccessStatusCode)
+                throw new HttpRequestException($"Failed to add new campaign");
+
+            var document = await response.Content.ReadFromJsonAsync<CampaignDocumentDto>();
+
+            return document
+                ?? throw new InvalidOperationException("No campaign document returned");
+        }
+
+        public async Task UpdateCampaignDocument(int campaignId, int documentId, CampaignDocumentUpdateDto documentToUpdate)
+        {
+            var response = await _http.PutAsJsonAsync(
+                $"/campaigns/{campaignId}/documents/{documentId}", documentToUpdate
+            );
+
+            if (!response.IsSuccessStatusCode)
+                throw new HttpRequestException($"Failed to update document: {documentToUpdate.DocumentName}");
+        }
+
+        public async Task DeleteCampaignDocument(int campaignId, int documentId)
+        {
+            var response = await _http.DeleteAsync(
+                $"/campaigns/{campaignId}"
+            );
+
+            if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+                throw new KeyNotFoundException($"Campaign with ID {campaignId} not found.");
+        }
+
         public async Task<ReferencesByCampaignDto> GetAllReferenceDocuments(int campaignId)
         {
             return await _http.GetFromJsonAsync<ReferencesByCampaignDto>(

@@ -1,9 +1,11 @@
-﻿
-namespace TabletopNote.Core.Models
+﻿using TabletopNote.Core.Models;
+
+namespace TabletopNote.UI.ViewModels
 {
-    public class CampaignDocument
+    public class DocumentVM
     {
-        public int DocumentId { get; set; }
+        public int? DocumentId { get; set; }
+        public int? CampaignId { get; set; }
         public string DocumentName { get; set; } = string.Empty;
         public string DocumentDescription { get; set; } = string.Empty;
         public DocumentContentType DocumentContentType { get; set; }
@@ -11,11 +13,5 @@ namespace TabletopNote.Core.Models
         public bool IsGMVisibleOnly { get; set; }
         public DateTime DocumentCreatedAt { get; set; }
         public DateTime DocumentUpdatedAt { get; set; }
-    }
-
-    public enum DocumentContentType
-    {
-        Note,
-        Table,
     }
 }

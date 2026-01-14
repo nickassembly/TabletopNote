@@ -1,0 +1,186 @@
+﻿@page "/campaigns/{CampaignId:int}/documents/{DocumentId:int}"
+@page "/campaigns/{CampaignId:int}/documents/new"
+
+@using TabletopNote.Core.Models
+@using TabletopNote.Shared.Dto
+@using TabletopNote.UI.Clients
+@using TabletopNote.UI.ViewModels
+@inject DocumentsApiClient DocumentsApi
+@inject NavigationManager NavigationManager
+
+<PageTitle>Document</PageTitle>
+
+<MudMainContent Class="pa-6">
+    <MudPaper Elevation="4" Class="pa-6 mx-auto"
+              Style="max-width:900px; border-radius:12px; background-color:#1E1E1E;">
+
+        <MudStack Spacing="3">
+            <MudText Typo="Typo.h4" Color="Color.Primary">
+                @(IsNewDocument ? "New Document" : $"{Document.DocumentName}")
+            </MudText>
+
+            <MudForm @ref="_form">
+                <MudToggleGroup T="DocumentContentType"
+                                @bind-Value="Document.DocumentContentType"
+                                Color="Color.Primary"
+                                Mandatory="true">
+
+                    <MudToggleItem Value="DocumentContentType.Note">
+                        <MudIcon Icon="@Icons.Material.Filled.Description" Class="me-1" />
+                        Note
+                    </MudToggleItem>
+
+                    <MudToggleItem Value="DocumentContentType.Table">
+                        <MudIcon Icon="@Icons.Material.Filled.TableChart" Class="me-1" />
+                        Table
+                    </MudToggleItem>
+                </MudToggleGroup>
+
+                <MudDivider Class="my-4" />
+
+                <MudTextField @bind-Value="Document.DocumentName"
+                              Label="Title"
+                              Required="true"
+                              For="@(() => Document.DocumentName)"
+                              Variant="Variant.Outlined" />
+
+                @if (Document.DocumentDescription != null)
+                {
+                    <MudTextField @bind-Value="Document.DocumentDescription"
+                                  Label="Summary"
+                                  Lines="3"
+                                  Variant="Variant.Outlined" />
+                }
+
+
+                @* Todo - Implement Table content type https://mudblazor.com/components/table#api
+                Will need to craete separate page, likely update how we store document content to support complex data structure.
+                 1. Create Table Editor component/page
+                 2. Update DocumentVM to handle Table data structure
+                 3. Update save/load logic to serialize/deserialize table data *@
+                @if (Document.DocumentContentType == DocumentContentType.Table)
+                {
+                    <MudText Typo="Typo.h6" Color="Color.Primary">
+                        Table functionality to be implemented in future version
+                    </MudText>
+                }
+
+                @if (Document.DocumentContentType == DocumentContentType.Note)
+                {
+                    @* TODO - update form to have back to documents navigation on left, expand rest of page to be wider 75%ish of page*@
+                    <MudTextField @bind-Value="Document.DocumentContent"
+                                  Label="Content"
+                                  Lines="30"
+                                  Variant="Variant.Outlined" />
+                }
+
+                <MudText Typo="Typo.body1" Color="Color.Primary">
+                    @* TODO - update to reflect correct time per local time of user..seems to show GMT *@
+                    Last Updated : @(Document.DocumentUpdatedAt) [Created on: @(Document.DocumentCreatedAt)]
+                </MudText>
+
+                <MudStack Direction="Row"
+                          JustifyContent="SpaceBetween"
+                          Class="mt-4">
+                    <MudButton Variant="Variant.Text"
+                               Color="Color.Secondary"
+                               OnClick="Cancel">
+                        Cancel
+                    </MudButton>
+
+                    <MudButton Variant="Variant.Filled"
+                               Color="Color.Primary"
+                               OnClick="SaveCampaignDocument">
+                        Save
+                    </MudButton>
+                </MudStack>
+            </MudForm>
+        </MudStack>
+    </MudPaper>
+</MudMainContent>
+
+
+@code {
+    [Parameter]
+    public int DocumentId { get; set; }
+
+    [Parameter]
+    public int CampaignId { get; set; }
+
+    private MudForm _form = null!;
+
+    private bool IsNewDocument => DocumentId == 0;
+
+    DocumentVM Document { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (IsNewDocument)
+        {
+            Document = new DocumentVM
+            {
+                CampaignId = CampaignId,
+                DocumentName = string.Empty,
+                DocumentDescription = string.Empty,
+                DocumentContentType = 0,
+                DocumentContent = string.Empty
+            };
+
+        }
+        else
+        {
+            var dto = await DocumentsApi.GetCampaignDocumentById(CampaignId, DocumentId);
+
+            Document = new DocumentVM
+            {
+                DocumentId = dto.DocumentId,
+                CampaignId = CampaignId,
+                DocumentName = dto.DocumentName,
+                DocumentDescription = dto.DocumentDescription,
+                DocumentContentType = dto.DocumentContentType,
+                DocumentContent = dto.DocumentContent,
+                IsGMVisibleOnly = dto.IsGMVisibleOnly,
+                DocumentCreatedAt = dto.DocumentCreatedAt,
+                DocumentUpdatedAt = dto.DocumentUpdatedAt
+            };
+        }
+    }
+
+    private async Task SaveCampaignDocument()
+    {
+        if (IsNewDocument)
+        {
+            var campaignDocumentToAdd = new CampaignDocumentAddDto
+            {
+                DocumentName = Document.DocumentName,
+                DocumentDescription = Document.DocumentDescription,
+                DocumentContentType = Document.DocumentContentType,
+                DocumentContent = Document.DocumentContent
+            };
+
+            await DocumentsApi.AddCampaignDocument(CampaignId, campaignDocumentToAdd);
+
+            NavigationManager.NavigateTo($"/campaigns/{Document.CampaignId}/documents");
+        }
+        else
+        {
+            var campaignDocumentToUpdate = new CampaignDocumentUpdateDto
+            {
+                DocumentName = Document.DocumentName,
+                DocumentDescription = Document.DocumentDescription,
+                DocumentContentType = Document.DocumentContentType,
+                DocumentContent = Document.DocumentContent
+            };
+
+            await DocumentsApi.UpdateCampaignDocument(CampaignId, DocumentId, campaignDocumentToUpdate);
+
+            // navigates back to page that was being edited
+            NavigationManager.NavigateTo($"/campaigns/{Document.CampaignId}/documents/{Document.DocumentId}");
+        }
+    }
+
+    private void Cancel()
+    {
+        NavigationManager.NavigateTo($"/campaigns/{Document.CampaignId}/documents");
+    }
+}

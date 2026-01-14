@@ -64,6 +64,14 @@
                                        FullWidth="true">
                                 Open / Edit
                             </MudButton>
+
+                            <MudCardActions Class="justify-end">
+                                <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                               Size="Size.Small"
+                                               Color="Color.Error"
+                                               StopPropagation="true"
+                                               OnClick="() => DeleteCampaignDocument(CampaignId, document.DocumentId)" />
+                            </MudCardActions>
                         </MudStack>
                     </MudPaper>
                 </MudItem>
@@ -92,12 +100,12 @@
 
     private void AddDocument()
     {
-
+        NavigationManager.NavigateTo($"campaigns/{CampaignId}/documents/new");
     }
 
     private void UpdateSelectedDocument(int documentId)
     {
-        NavigationManager.NavigateTo($"/documents/{documentId}");
+        NavigationManager.NavigateTo($"campaigns/{CampaignId}/documents/{documentId}");
     }
 
     private string GetContentTypeIcon(string contentType)
@@ -108,6 +116,14 @@
             "table" => Icons.Material.Filled.TableChart,
             _ => Icons.Material.Filled.EventNote
         };
+    }
+
+    async Task DeleteCampaignDocument(int campaignId, int documentId)
+    {
+        await DocumentsApi.DeleteCampaignDocument(campaignId, documentId);
+
+        // TODO - Add CampaignId to CampaignDocumentDto
+        // ensure campaignId and documentId are correct and the correct document is deleted after this call
     }
 
 }

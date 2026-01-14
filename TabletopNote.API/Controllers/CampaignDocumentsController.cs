@@ -106,9 +106,9 @@ namespace TabletopNote.API.Controllers
             await _context.SaveChangesAsync();
 
             return CreatedAtAction(
-                nameof(AddCampaignDocument),
-                new { campaignId, id = campaignDocumentToAdd.DocumentId },
-                null);
+                nameof(GetCampaignDocumentById),
+                new { campaignId, documentId = campaignDocumentToAdd.DocumentId },
+                campaignDocumentToAdd);
         }
 
         [HttpPut("{documentId}")]
