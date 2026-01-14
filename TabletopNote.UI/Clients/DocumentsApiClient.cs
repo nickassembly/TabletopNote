@@ -19,6 +19,20 @@ namespace TabletopNote.UI.Clients
             ) ?? throw new InvalidOperationException("No response");
         }
 
+        public async Task<CampaignDto> AddCampaign(CampaignAddDto campaignToAdd)
+        {
+            return await _http.GetFromJsonAsync<CampaignDto>(
+                $"/campaigns"
+            ) ?? throw new InvalidOperationException("No response");
+        }
+
+        public async Task<CampaignDto> UpdateCampaign(CampaignUpdateDto campaignToUpdate, int campaignId)
+        {
+            return await _http.GetFromJsonAsync<CampaignDto>(
+                $"/campaigns"
+            ) ?? throw new InvalidOperationException("No response");
+        }
+
         public async Task<CampaignDto> GetCampaignById(int campaignId)
         {
             return await _http.GetFromJsonAsync<CampaignDto>(

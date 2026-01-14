@@ -22,7 +22,6 @@
     </MudStack>
 </MudDrawer>
 
-<!-- Main Content -->
 <MudMainContent>
     <MudContainer MaxWidth="MaxWidth.False" Class="pa-6">
         <MudStack Direction="Column" AlignItems=AlignItems.Center Spacing="1" Class="mb-4">
@@ -96,7 +95,7 @@
 
     void AddCampaign()
     {
-        
+        NavigationManager.NavigateTo($"/campaigns/new");
     }
 
     void OpenCampaign(int campaignId)

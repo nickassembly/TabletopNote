@@ -1,17 +1,22 @@
 ﻿@page "/campaigns/{CampaignId:int}"
+@page "/campaigns/new"
+@using TabletopNote.API.Dtos
 @using TabletopNote.UI.Clients
 @using TabletopNote.UI.ViewModels
+@using TabletopNote.Shared
 @inject DocumentsApiClient DocumentsApi
 @inject NavigationManager NavigationManager
 
 <!-- Side Panel -->
-<MudDrawer Open="true" Elevation="1" Width="260px" ClipMode="DrawerClipMode.Never">
-    <MudNavMenu Dense="true" Class="pa-2">
-        <CampaignSectionNav CampaignId="@CampaignId" IsHorizontal="false" ButtonSize="Size.Medium" IconSize="Size.Medium" />
-    </MudNavMenu>
-</MudDrawer>
+@if (!IsNewCampaign)
+{
+    <MudDrawer Open="true" Elevation="1" Width="260px" ClipMode="DrawerClipMode.Never">
+        <MudNavMenu Dense="true" Class="pa-2">
+            <CampaignSectionNav CampaignId="@CampaignId" IsHorizontal="false" ButtonSize="Size.Medium" IconSize="Size.Medium" />
+        </MudNavMenu>
+    </MudDrawer>
+}
 
-<!-- Main Content -->
 <MudMainContent Class="pa-6">
     @if (Campaign == null)
     {
@@ -24,12 +29,35 @@
             <MudStack Spacing="3">
                 <MudText Typo="Typo.h3" Color="Color.Primary">
                     <MudIcon Icon="@Icons.Material.Filled.MenuBook" Class="me-2" />
-                    @Campaign.CampaignName
+                    @(IsNewCampaign ? "New Campaign" : Campaign.CampaignName)
                 </MudText>
 
-                <MudText Typo="Typo.body1" Color="Color.Secondary">
-                    @Campaign.CampaignDescription
-                </MudText>
+
+                @if (IsNewCampaign)
+                {
+                    <MudTextField Label="Campaign Name"
+                                  @bind-Value="Campaign.CampaignName"
+                                  Variant="Variant.Outlined"
+                                  Required />
+
+                    <MudTextField Label="Description"
+                                  @bind-Value="Campaign.CampaignDescription"
+                                  Variant="Variant.Outlined"
+                                  Lines="4" />
+                }
+                else
+                {
+                    <MudText Typo="Typo.body1" Color="Color.Secondary">
+                        @Campaign.CampaignDescription
+                    </MudText>
+                }
+
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Success"
+                           StartIcon="@Icons.Material.Filled.Save"
+                           OnClick="SaveCampaign">
+                    @(IsNewCampaign ? "Create Campaign" : "Save Changes")
+                </MudButton>
 
                 <!-- Quick Nav Buttons for small screens -->
                 <MudHidden Breakpoint="Breakpoint.MdAndUp">
@@ -40,8 +68,9 @@
     }
 </MudMainContent>
 
+    @code {
+    private bool IsNewCampaign => CampaignId == 0;
 
-@code {
     [Parameter]
     public int CampaignId { get; set; }
 
@@ -49,16 +78,55 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var campaignDto = await DocumentsApi.GetCampaignById(CampaignId);
-
-        Campaign = new CampaignVM
+        if (IsNewCampaign)
         {
-            CampaignId = campaignDto.CampaignId,
-            CampaignName = campaignDto.CampaignName,
-            CampaignDescription = campaignDto.CampaignDescription,
-            CampaignDocuments = campaignDto.CampaignDocuments.ToList(),
-            ReferenceDocuments = campaignDto.ReferenceDocuments.ToList(),
-            CalendarEvents = campaignDto.CalendarEvents.ToList()
-        };
+            Campaign = new CampaignVM
+                {
+                    CampaignName = string.Empty,
+                    CampaignDescription = string.Empty
+                };
+            return;
+        }
+        else
+        {
+            var campaignDto = await DocumentsApi.GetCampaignById(CampaignId);
+
+            Campaign = new CampaignVM
+            {
+                CampaignId = campaignDto.CampaignId,
+                CampaignName = campaignDto.CampaignName,
+                CampaignDescription = campaignDto.CampaignDescription,
+                CampaignDocuments = campaignDto.CampaignDocuments.ToList(),
+                ReferenceDocuments = campaignDto.ReferenceDocuments.ToList(),
+                CalendarEvents = campaignDto.CalendarEvents.ToList()
+            };
+        }
     }
+
+    public async Task SaveCampaign()
+    {
+        if (IsNewCampaign)
+        {
+            var campaignToAdd = new CampaignAddDto
+            {
+                CampaignName = Campaign.CampaignName,
+                CampaignDescription = Campaign.CampaignDescription
+            };
+
+            var newId = await DocumentsApi.AddCampaign(campaignToAdd);
+
+            NavigationManager.NavigateTo($"/campaigns/{newId}");
+        }
+        else
+        {
+            var campaignToUpdate = new CampaignUpdateDto
+            {
+                CampaignName = Campaign.CampaignName,
+                CampaignDescription = Campaign.CampaignDescription
+            };
+
+            await DocumentsApi.UpdateCampaign(campaignToUpdate, CampaignId);
+        }
+    }
+
 }
