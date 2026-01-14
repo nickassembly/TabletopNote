@@ -1,5 +1,4 @@
-﻿using TabletopNote.API.Dtos;
-using TabletopNote.Shared;
+﻿using TabletopNote.Shared.Dto;
 
 namespace TabletopNote.UI.Clients
 {
@@ -21,16 +20,27 @@ namespace TabletopNote.UI.Clients
 
         public async Task<CampaignDto> AddCampaign(CampaignAddDto campaignToAdd)
         {
-            return await _http.GetFromJsonAsync<CampaignDto>(
-                $"/campaigns"
-            ) ?? throw new InvalidOperationException("No response");
+            var response = await _http.PostAsJsonAsync(
+                $"/campaigns", campaignToAdd
+            );
+
+            if (!response.IsSuccessStatusCode)
+                throw new HttpRequestException($"Failed to add new campaign");
+
+            var campaign = await response.Content.ReadFromJsonAsync<CampaignDto>();
+
+            return campaign 
+                ?? throw new InvalidOperationException("No campaign returned");
         }
 
-        public async Task<CampaignDto> UpdateCampaign(CampaignUpdateDto campaignToUpdate, int campaignId)
+        public async Task UpdateCampaign(CampaignUpdateDto campaignToUpdate, int campaignId)
         {
-            return await _http.GetFromJsonAsync<CampaignDto>(
-                $"/campaigns"
-            ) ?? throw new InvalidOperationException("No response");
+            var response = await _http.PutAsJsonAsync(
+                $"/campaigns/{campaignId}", campaignToUpdate
+            );
+
+            if (!response.IsSuccessStatusCode)
+                throw new HttpRequestException($"Failed to update campaign {campaignId}");
         }
 
         public async Task<CampaignDto> GetCampaignById(int campaignId)

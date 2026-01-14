@@ -1,6 +1,6 @@
 ﻿@page "/campaigns/{CampaignId:int}"
 @page "/campaigns/new"
-@using TabletopNote.API.Dtos
+@using TabletopNote.Shared.Dto;
 @using TabletopNote.UI.Clients
 @using TabletopNote.UI.ViewModels
 @using TabletopNote.Shared
@@ -44,6 +44,12 @@
                                   @bind-Value="Campaign.CampaignDescription"
                                   Variant="Variant.Outlined"
                                   Lines="4" />
+
+                    <MudButton Variant="Variant.Filled"
+                               Color="Color.Success"
+                               StartIcon="@Icons.Material.Filled.Save"
+                               OnClick="SaveCampaign">
+                    </MudButton>
                 }
                 else
                 {
@@ -51,13 +57,6 @@
                         @Campaign.CampaignDescription
                     </MudText>
                 }
-
-                <MudButton Variant="Variant.Filled"
-                           Color="Color.Success"
-                           StartIcon="@Icons.Material.Filled.Save"
-                           OnClick="SaveCampaign">
-                    @(IsNewCampaign ? "Create Campaign" : "Save Changes")
-                </MudButton>
 
                 <!-- Quick Nav Buttons for small screens -->
                 <MudHidden Breakpoint="Breakpoint.MdAndUp">
@@ -68,7 +67,7 @@
     }
 </MudMainContent>
 
-    @code {
+@code {
     private bool IsNewCampaign => CampaignId == 0;
 
     [Parameter]
@@ -81,11 +80,10 @@
         if (IsNewCampaign)
         {
             Campaign = new CampaignVM
-                {
-                    CampaignName = string.Empty,
-                    CampaignDescription = string.Empty
-                };
-            return;
+            {
+                CampaignName = string.Empty,
+                CampaignDescription = string.Empty
+            };
         }
         else
         {
@@ -113,9 +111,9 @@
                 CampaignDescription = Campaign.CampaignDescription
             };
 
-            var newId = await DocumentsApi.AddCampaign(campaignToAdd);
+            var newCampaign = await DocumentsApi.AddCampaign(campaignToAdd);
 
-            NavigationManager.NavigateTo($"/campaigns/{newId}");
+            NavigationManager.NavigateTo($"/campaigns/{newCampaign.CampaignId}");
         }
         else
         {

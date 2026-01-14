@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using TabletopNote.API.Dtos;
+using TabletopNote.Shared.Dto;
 using TabletopNote.Data;
 using TabletopNote.Data.Entities;
 using Microsoft.EntityFrameworkCore;

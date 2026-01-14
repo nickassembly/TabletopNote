@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using TabletopNote.Core.Models;
 
-namespace TabletopNote.API.Dtos
+namespace TabletopNote.Shared.Dto
 {
     public class CampaignAddDto
     {

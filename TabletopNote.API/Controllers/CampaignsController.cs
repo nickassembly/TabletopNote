@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using TabletopNote.API.Dtos;
+using TabletopNote.Shared.Dto;
 using TabletopNote.Core.Models;
 using TabletopNote.Data;
 using TabletopNote.Data.Entities;
@@ -188,7 +188,7 @@ namespace TabletopNote.API.Controllers
             _context.Campaigns.Update(campaign);
             await _context.SaveChangesAsync();
 
-            return NoContent();
+            return Ok();
         }
 
         [HttpDelete("{id}")]

@@ -1,9 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using TabletopNote.Core.Models;
 
-namespace TabletopNote.API.Dtos
+namespace TabletopNote.Shared.Dto
 {
-    public class CampaignDocumentUpdateDto
+    public class CampaignDocumentAddDto
     {
         [Required]
         [MinLength(3, ErrorMessage = "Document name must be at least 3 characters long.")]

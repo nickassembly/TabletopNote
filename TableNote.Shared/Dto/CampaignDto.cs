@@ -1,8 +1,9 @@
-﻿using TabletopNote.Shared.Dto;
+﻿using System.ComponentModel.DataAnnotations;
+using TabletopNote.Core.Models;
 
-namespace TabletopNote.UI.ViewModels
+namespace TabletopNote.Shared.Dto
 {
-    public class CampaignVM
+    public class CampaignDto
     {
         public int CampaignId { get; set; }
         public string CampaignName { get; set; } = string.Empty;

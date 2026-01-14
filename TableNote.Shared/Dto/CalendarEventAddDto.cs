@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace TabletopNote.API.Dtos
+namespace TabletopNote.Shared.Dto
 {
-    public class CalendarEventUpdateDto
+    public class CalendarEventAddDto
     {
         [Required]
         [MinLength(3, ErrorMessage = "Event name must be at least 3 characters long.")]

@@ -1,5 +1,5 @@
 ﻿
-namespace TabletopNote.Shared
+namespace TabletopNote.Shared.Dto
 {
     public class DocumentsByCampaignDto
     {

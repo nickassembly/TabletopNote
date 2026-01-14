@@ -1,4 +1,4 @@
-﻿using TabletopNote.API.Dtos;
+﻿using TabletopNote.Shared.Dto;
 using TabletopNote.UI.ViewModels;
 
 namespace TabletopNote.UI.Mappings

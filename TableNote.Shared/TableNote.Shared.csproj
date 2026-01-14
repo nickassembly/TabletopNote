@@ -10,4 +10,8 @@
     <ProjectReference Include="..\TabletopNote.Core\TabletopNote.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Dto\" />
+  </ItemGroup>
+
 </Project>

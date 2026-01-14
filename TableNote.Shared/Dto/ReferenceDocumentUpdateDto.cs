@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace TabletopNote.API.Dtos
+namespace TabletopNote.Shared.Dto
 {
     public class ReferenceDocumentUpdateDto
     {
