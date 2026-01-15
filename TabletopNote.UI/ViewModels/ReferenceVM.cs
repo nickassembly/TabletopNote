@@ -1,8 +1,6 @@
-﻿using TabletopNote.Core.Models;
-
-namespace TabletopNote.UI.ViewModels
+﻿namespace TabletopNote.UI.ViewModels
 {
-    public class ReferenceDocumentVM
+    public class ReferenceVM
     {
         public int CampaignId { get; set; }
         public int FileId { get; set; }
@@ -10,6 +8,5 @@ namespace TabletopNote.UI.ViewModels
         public string FileDescription { get; set; } = string.Empty;
         public string? FilePath { get; set; }
         public string? Url { get; set; }
-        public bool IsGMVisibleOnly { get; set; }
     }
 }

@@ -1,0 +1,234 @@
+﻿@page "/campaigns/{CampaignId:int}/references/{FileId:int}"
+@page "/campaigns/{CampaignId:int}/references/new"
+
+@using TabletopNote.Core.Models
+@using TabletopNote.Shared.Dto
+@using TabletopNote.UI.Clients
+@using TabletopNote.UI.ViewModels
+@inject DocumentsApiClient DocumentsApi
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar
+
+<PageTitle>Reference</PageTitle>
+
+@if (!IsNewReference)
+{
+    <MudDrawer Open="true" Elevation="1" Width="260px" ClipMode="DrawerClipMode.Never">
+        <MudNavMenu Dense="true" Class="pa-2">
+            <CampaignSectionNav CampaignId="@CampaignId" IsHorizontal="false" ButtonSize="Size.Medium" IconSize="Size.Medium" />
+        </MudNavMenu>
+    </MudDrawer>
+}
+
+<MudMainContent Class="pa-6">
+    <MudPaper Elevation="4" Class="pa-6 mx-auto"
+              Style="max-width:900px; border-radius:12px; background-color:#1E1E1E;">
+
+        <MudStack Spacing="3">
+            <MudText Typo="Typo.h4" Color="Color.Primary">
+                @(IsNewReference ? "Add New Reference" : Reference.ReferenceFileName)
+            </MudText>
+
+            <MudForm @ref="_form">
+                <MudTextField @bind-Value="Reference.ReferenceFileName"
+                              Label="File Name"
+                              Required="true"
+                              For="@(() => Reference.ReferenceFileName)"
+                              Variant="Variant.Outlined" />
+
+                <MudTextField @bind-Value="Reference.FileDescription"
+                              Label="File Description"
+                              Required="true"
+                              For="@(() => Reference.FileDescription)"
+                              Lines="3"
+                              Variant="Variant.Outlined" />
+
+                @*   TODO - integrate into File Upload Component then Remove *@
+                @* <MudTextField @bind-Value="Reference.FilePath"
+                              Label="Enter File Path"
+                              For="@(() => Reference.FilePath)"
+                              Variant="Variant.Outlined" /> *@
+
+                @* File Upload *@
+                @* Component input should be file path, stored as Reference.FilePath*@
+                <MudStack Style="width: 100%">
+                    <MudFileUpload T="IReadOnlyList<IBrowserFile>"
+                                   @ref="@_fileUpload"
+                                   OnFilesChanged="OnInputFileChanged"
+                                   AppendMultipleFiles
+                                   Hidden="@false"
+                                   InputClass="file-upload-input"
+                                   tabindex="-1"
+                                   @ondrop="@ClearDragClass"
+                                   @ondragenter="@SetDragClass"
+                                   @ondragleave="@ClearDragClass"
+                                   @ondragend="@ClearDragClass">
+                        <ActivatorContent>
+                            <MudPaper Height="300px"
+                                      Outlined="true"
+                                      Class="@_dragClass">
+                                <MudText Typo="Typo.h6">
+                                    Drag and drop files here or click
+                                </MudText>
+                                @foreach (var file in _fileNames)
+                                {
+                                    <MudChip T="string"
+                                             Color="Color.Dark"
+                                             Text="@file"
+                                             tabindex="-1" />
+                                }
+                            </MudPaper>
+                        </ActivatorContent>
+                    </MudFileUpload>
+                    <MudToolBar Gutters="@false"
+                                Class="relative d-flex justify-end gap-4">
+                        <MudButton Color="Color.Primary"
+                                   OnClick="@OpenFilePickerAsync"
+                                   Variant="Variant.Filled">
+                            Open file picker
+                        </MudButton>
+                        <MudButton Color="Color.Primary"
+                                   Disabled="@(!_fileNames.Any())"
+                                   OnClick="@Upload"
+                                   Variant="Variant.Filled">
+                            Attach File
+                        </MudButton>
+                        <MudButton Color="Color.Error"
+                                   Disabled="@(!_fileNames.Any())"
+                                   OnClick="@ClearAsync"
+                                   Variant="Variant.Filled">
+                            Clear
+                        </MudButton>
+                    </MudToolBar>
+                </MudStack>
+
+                <MudStack Direction="Row" JustifyContent="SpaceBetween" Class="mt-4">
+                    <MudButton Variant="Variant.Text"
+                               Color="Color.Secondary"
+                               OnClick="Cancel">
+                        Cancel
+                    </MudButton>
+
+                    <MudButton Variant="Variant.Filled"
+                               Color="Color.Primary"
+                               OnClick="SaveReferenceDocument">
+                        Save
+                    </MudButton>
+                </MudStack>
+            </MudForm>
+        </MudStack>
+    </MudPaper>
+</MudMainContent>
+
+@code {
+    private MudForm _form = null!;
+
+    [Parameter] public int FileId { get; set; }
+    [Parameter] public int CampaignId { get; set; }
+
+    private bool IsNewReference => FileId == 0;
+    private ReferenceVM Reference { get; set; } = new();
+    protected override async Task OnInitializedAsync()
+    {
+        if (IsNewReference)
+        {
+            Reference = new ReferenceVM
+            {
+                CampaignId = CampaignId,
+                ReferenceFileName = string.Empty,
+                FileDescription = string.Empty,
+                FilePath = string.Empty,
+                Url = string.Empty
+            };
+        }
+        else
+        {
+            var dto = await DocumentsApi.GetReferenceDocumentById(CampaignId, FileId);
+
+            Reference = new ReferenceVM
+            {
+                CampaignId = dto.CampaignId,
+                ReferenceFileName = dto.ReferenceFileName,
+                FileDescription = dto.FileDescription,
+                FilePath = dto.FilePath,
+                Url = dto.Url
+            };
+        }
+    }
+
+    private async Task SaveReferenceDocument()
+    {
+        if (IsNewReference)
+        {
+            var referenceDocumentToAdd = new ReferenceDocumentAddDto
+            {
+                CampaignId = Reference.CampaignId,
+                ReferenceFileName = Reference.ReferenceFileName,
+                FileDescription = Reference.FileDescription,
+                FilePath = Reference.FilePath,
+                Url = Reference.Url
+            };
+
+            await DocumentsApi.AddReferenceDocument(CampaignId, referenceDocumentToAdd);
+        }
+        else
+        {
+            var referenceDocumentToUpdate = new ReferenceDocumentUpdateDto
+            {
+                ReferenceFileName = Reference.ReferenceFileName,
+                FileDescription = Reference.FileDescription,
+                FilePath = Reference.FilePath,
+                Url = Reference.Url
+            };
+
+            await DocumentsApi.UpdateReferenceDocument(CampaignId, FileId, referenceDocumentToUpdate);
+        }
+
+        NavigationManager.NavigateTo($"/campaigns/{Reference.CampaignId}/references");
+    }
+
+    private void Cancel()
+    {
+        NavigationManager.NavigateTo($"/campaigns/{Reference.CampaignId}/references");
+    }
+
+    // file  upload logic
+    #nullable enable
+    private const string DefaultDragClass = "relative rounded-lg border-2 border-dashed pa-4 mt-4 mud-width-full mud-height-full";
+    private string _dragClass = DefaultDragClass;
+    private readonly List<string> _fileNames = new();
+    private MudFileUpload<IReadOnlyList<IBrowserFile>>? _fileUpload;
+
+    private async Task ClearAsync()
+    {
+        await (_fileUpload?.ClearAsync() ?? Task.CompletedTask);
+        _fileNames.Clear();
+        ClearDragClass();
+    }
+
+    private Task OpenFilePickerAsync()
+        => _fileUpload?.OpenFilePickerAsync() ?? Task.CompletedTask;
+
+    private void OnInputFileChanged(InputFileChangeEventArgs e)
+    {
+        ClearDragClass();
+        var files = e.GetMultipleFiles();
+        foreach (var file in files)
+        {
+            _fileNames.Add(file.Name);
+        }
+    }
+
+    private void Upload()
+    {
+        // Upload the files here
+        Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+        Snackbar.Add("TODO: Upload your files!");
+    }
+
+    private void SetDragClass()
+        => _dragClass = $"{DefaultDragClass} mud-border-primary";
+
+    private void ClearDragClass()
+        => _dragClass = DefaultDragClass;
+}

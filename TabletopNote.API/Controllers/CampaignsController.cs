@@ -56,6 +56,7 @@ namespace TabletopNote.API.Controllers
                     ReferenceDocuments = campaign.ReferenceDocuments
                     .Select(r => new ReferenceDocumentDto
                     {
+                        CampaignId = r.CampaignId,
                         FileId = r.FileId,
                         ReferenceFileName = r.ReferenceFileName,
                         FileDescription = r.FileDescription,
@@ -115,6 +116,7 @@ namespace TabletopNote.API.Controllers
                 ReferenceDocuments = campaign.ReferenceDocuments
                     .Select(r => new ReferenceDocumentDto
                     {
+                        CampaignId = r.CampaignId,
                         FileId = r.FileId,
                         ReferenceFileName = r.ReferenceFileName,
                         FileDescription = r.FileDescription,

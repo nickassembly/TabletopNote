@@ -4,6 +4,8 @@ namespace TabletopNote.Shared.Dto
 {
     public class ReferenceDocumentAddDto
     {
+        public int CampaignId { get; set; }
+
         [Required]
         [MinLength(3, ErrorMessage = "file name must be at least 3 characters long.")]
         [MaxLength(100, ErrorMessage = "file name cannot exceed 100 characters.")]

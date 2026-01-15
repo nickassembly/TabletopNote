@@ -1,4 +1,5 @@
 ﻿@page "/campaigns/{campaignId:int}/references"
+
 @using TabletopNote.Shared
 @using TabletopNote.UI.Clients
 @using TabletopNote.UI.Mappings
@@ -25,7 +26,7 @@
         <MudButton Variant="Variant.Outlined"
                    Color="Color.Info"
                    StartIcon="@Icons.Material.Filled.AttachFile"
-                   OnClick="AddDocument">
+                   OnClick="AddReference">
             New Reference
         </MudButton>
     </MudStack>
@@ -123,9 +124,9 @@
         };
     }
 
-    private void AddDocument()
+    private void AddReference()
     {
-
+        NavigationManager.NavigateTo($"campaigns/{CampaignId}/references/new");
     }
 
     private void NavigateBack()
@@ -135,7 +136,7 @@
 
     private void UpdateSelectedReference(int fileId)
     {
-        NavigationManager.NavigateTo($"/references/{fileId}/edit");
+        NavigationManager.NavigateTo($"/campaigns/{CampaignId}/references/{fileId}");
     }
 
     private string GetReferenceIcon(ReferenceDocumentVM reference)

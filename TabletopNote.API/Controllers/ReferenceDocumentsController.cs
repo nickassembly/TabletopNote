@@ -35,6 +35,7 @@ namespace TabletopNote.API.Controllers
             {
                 referenceDocumentDtos.Add(new ReferenceDocumentDto
                 {
+                    CampaignId = referenceDocument.CampaignId,
                     FileId = referenceDocument.FileId,
                     ReferenceFileName = referenceDocument.ReferenceFileName,
                     FileDescription = referenceDocument.FileDescription,

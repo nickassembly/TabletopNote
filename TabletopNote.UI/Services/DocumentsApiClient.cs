@@ -18,6 +18,7 @@ namespace TabletopNote.UI.Clients
             ) ?? throw new InvalidOperationException("No response");
         }
 
+        // TODO - Add Error Handling
         public async Task<CampaignDto> AddCampaign(CampaignAddDto campaignToAdd)
         {
             var response = await _http.PostAsJsonAsync(
@@ -106,7 +107,7 @@ namespace TabletopNote.UI.Clients
             );
 
             if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
-                throw new KeyNotFoundException($"Campaign with ID {campaignId} not found.");
+                throw new KeyNotFoundException($"Document with ID {documentId} not found.");
         }
 
         public async Task<ReferencesByCampaignDto> GetAllReferenceDocuments(int campaignId)
@@ -114,6 +115,48 @@ namespace TabletopNote.UI.Clients
             return await _http.GetFromJsonAsync<ReferencesByCampaignDto>(
                 $"campaigns/{campaignId}/references"
             ) ?? throw new InvalidOperationException("No response");
+        }
+
+        public async Task<ReferenceDocumentDto> GetReferenceDocumentById(int campaignId, int fileId)
+        {
+            return await _http.GetFromJsonAsync<ReferenceDocumentDto>(
+                $"/campaigns/{campaignId}/references/{fileId}"
+            ) ?? throw new InvalidOperationException("No response");
+        }
+
+        public async Task<ReferenceDocumentDto> AddReferenceDocument(int campaignId, ReferenceDocumentAddDto referenceDocumentToAdd)
+        {
+            var response = await _http.PostAsJsonAsync(
+               $"/campaigns/{campaignId}/references", referenceDocumentToAdd
+           );
+
+            if (!response.IsSuccessStatusCode)
+                throw new HttpRequestException($"Failed to add new reference");
+
+            var document = await response.Content.ReadFromJsonAsync<ReferenceDocumentDto>();
+
+            return document
+                ?? throw new InvalidOperationException("No reference document returned");
+        }
+
+        public async Task UpdateReferenceDocument(int campaignId, int fileId, ReferenceDocumentUpdateDto referenceDocumentToUpdate)
+        {
+            var response = await _http.PutAsJsonAsync(
+                $"/campaigns/{campaignId}/references/{fileId}", referenceDocumentToUpdate
+            );
+
+            if (!response.IsSuccessStatusCode)
+                throw new HttpRequestException($"Failed to update document: {referenceDocumentToUpdate.ReferenceFileName}");
+        }
+
+        public async Task DeleteReferenceDocument(int campaignId, int fileId)
+        {
+            var response = await _http.DeleteAsync(
+                $"/campaigns/{campaignId}/references/{fileId}"
+            );
+
+            if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+                throw new KeyNotFoundException($"Reference document with ID {fileId} not found.");
         }
 
         public async Task<EventsByCampaignDto> GetAllCalendarEvents(int campaignId)
