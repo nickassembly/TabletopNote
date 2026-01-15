@@ -43,6 +43,7 @@ namespace TabletopNote.API.Controllers
                     CampaignDocuments = campaign.CampaignDocuments
                     .Select(d => new CampaignDocumentDto
                     {
+                        CampaignId = d.CampaignId,
                         DocumentId = d.DocumentId,
                         DocumentName = d.DocumentName,
                         DocumentDescription = d.DocumentDescription,
@@ -101,6 +102,7 @@ namespace TabletopNote.API.Controllers
                 CampaignDocuments = campaign.CampaignDocuments
                     .Select(d => new CampaignDocumentDto
                     {
+                        CampaignId = d.CampaignId,
                         DocumentId = d.DocumentId,
                         DocumentName = d.DocumentName,
                         DocumentDescription = d.DocumentDescription,

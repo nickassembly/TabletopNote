@@ -55,7 +55,7 @@ namespace TabletopNote.API.Controllers
 
         [HttpGet("{calendarEventId}")]
         // GET - /campaigns/{campaignId}/events/{calendarEventId}
-        public async Task<ActionResult<CampaignDocumentDto>> GetReferenceDocumentById(
+        public async Task<ActionResult<CalendarEventDto>> GetReferenceDocumentById(
             [FromRoute] int campaignId,
             [FromRoute] int calendarEventId)
         {

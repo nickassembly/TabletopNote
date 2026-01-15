@@ -35,6 +35,7 @@
                 <MudItem xs="12" sm="6" md="4">
                     <MudPaper Elevation="3"
                               Class="pa-4"
+                              @key="document.DocumentId"
                               Style="height:100%; background-color:#1E1E1E; border-radius:12px;">
 
                         <MudStack Spacing="2" Style="height:100%;">
@@ -80,7 +81,7 @@
     }
 </MudStack>
 
-@code {
+    @code {
     [Parameter]
     public int CampaignId { get; set; }
 
@@ -122,8 +123,15 @@
     {
         await DocumentsApi.DeleteCampaignDocument(campaignId, documentId);
 
-        // TODO - Add CampaignId to CampaignDocumentDto
-        // ensure campaignId and documentId are correct and the correct document is deleted after this call
+        var documentToRemove = State.Page?.CampaignDocuments
+            .FirstOrDefault(d => d.DocumentId == documentId && d.CampaignId == campaignId);
+
+        if (documentToRemove != null)
+        {
+            State.Page?.CampaignDocuments.Remove(documentToRemove);
+        }
+
+        StateHasChanged();
     }
 
 }

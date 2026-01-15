@@ -35,7 +35,7 @@
         <MudGrid Spacing="3">
             @foreach (var campaign in CampaignList)
             {
-                <MudItem xs="12" sm="6" md="4" lg="3">
+                <MudItem xs="12" sm="6" md="4" lg="3" @key="campaign.CampaignId">
                     <MudCard Class="campaign-card"
                              Elevation="3"
                              Style="cursor:pointer"
@@ -103,10 +103,14 @@
     {
         await DocumentsApi.DeleteCampaign(campaignId);
 
-        var campaign = CampaignList.FirstOrDefault(c => c.CampaignId == campaignId);
-       
-        if (campaign != null)
-            CampaignList.Remove(campaign);
+        var campaignToRemove = CampaignList.FirstOrDefault(c => c.CampaignId == campaignId);
+
+        if (campaignToRemove != null)
+        {
+            CampaignList.Remove(campaignToRemove);
+        }
+
+        StateHasChanged();
     }
 }
 

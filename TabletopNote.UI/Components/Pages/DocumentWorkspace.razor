@@ -134,7 +134,7 @@
             Document = new DocumentVM
             {
                 DocumentId = dto.DocumentId,
-                CampaignId = CampaignId,
+                CampaignId = dto.CampaignId,
                 DocumentName = dto.DocumentName,
                 DocumentDescription = dto.DocumentDescription,
                 DocumentContentType = dto.DocumentContentType,
@@ -152,6 +152,7 @@
         {
             var campaignDocumentToAdd = new CampaignDocumentAddDto
             {
+                CampaignId = Document.CampaignId,
                 DocumentName = Document.DocumentName,
                 DocumentDescription = Document.DocumentDescription,
                 DocumentContentType = Document.DocumentContentType,
@@ -166,6 +167,7 @@
         {
             var campaignDocumentToUpdate = new CampaignDocumentUpdateDto
             {
+                
                 DocumentName = Document.DocumentName,
                 DocumentDescription = Document.DocumentDescription,
                 DocumentContentType = Document.DocumentContentType,

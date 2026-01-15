@@ -36,6 +36,7 @@ namespace TabletopNote.API.Controllers
             {
                 campaignDocumentDtos.Add(new CampaignDocumentDto
                 {
+                    CampaignId = campaignDocument.CampaignId,
                     DocumentId = campaignDocument.DocumentId,
                     DocumentName = campaignDocument.DocumentName,
                     DocumentDescription = campaignDocument.DocumentDescription,
@@ -92,7 +93,7 @@ namespace TabletopNote.API.Controllers
 
             var campaignDocumentToAdd = new CampaignDocumentEntity
             {
-                CampaignId = campaignId,
+                CampaignId = newCampaignDocument.CampaignId,
                 DocumentName = newCampaignDocument.DocumentName,
                 DocumentDescription = newCampaignDocument.DocumentDescription,
                 DocumentContentType = (int)newCampaignDocument.DocumentContentType,

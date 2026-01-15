@@ -56,7 +56,7 @@ namespace TabletopNote.API.Controllers
 
         [HttpGet("{fileId}")]
         // GET - /campaigns/{campaignId}/references/{fileId}
-        public async Task<ActionResult<CampaignDocumentDto>> GetReferenceDocumentById(
+        public async Task<ActionResult<ReferenceDocumentDto>> GetReferenceDocumentById(
             [FromRoute] int campaignId,
             [FromRoute] int fileId)
         {

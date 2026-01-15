@@ -10,6 +10,7 @@ namespace TabletopNote.UI.Mappings
         {
             return new CampaignDocumentVM
             {
+                CampaignId = dto.CampaignId,
                 DocumentId = dto.DocumentId,
                 DocumentName = dto.DocumentName,
                 DocumentDescription = dto.DocumentDescription,

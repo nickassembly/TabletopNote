@@ -5,6 +5,8 @@ namespace TabletopNote.Shared.Dto
 {
     public class CampaignDocumentAddDto
     {
+        public int CampaignId { get; set; }
+
         [Required]
         [MinLength(3, ErrorMessage = "Document name must be at least 3 characters long.")]
         [MaxLength(100, ErrorMessage = "Document name cannot exceed 100 characters.")]
