@@ -14,6 +14,9 @@ builder.Services.AddHttpClient<DocumentsApiClient>(client =>
 
 builder.Services.AddMudServices();
 
+builder.Services.AddScoped<UserTimeService>();
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

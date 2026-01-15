@@ -13,6 +13,13 @@
         Events of Note
     </MudText>
 
+    <MudButton Variant="Variant.Outlined"
+               Color="Color.Warning"
+               StartIcon="@Icons.Material.Outlined.ArrowBack"
+               OnClick="NavigateBack">
+        Campaign Info
+    </MudButton>
+
     <MudButton Variant="Variant.Filled"
                Color="Color.Success"
                StartIcon="@Icons.Material.Filled.Add"
@@ -111,6 +118,11 @@ else
     private void AddEvent()
     {
 
+    }
+
+    private void NavigateBack()
+    {
+        NavigationManager.NavigateTo($"/campaigns/{CampaignId}");
     }
 
     private void UpdateSelectedEvent(CalendarEventVM ev)

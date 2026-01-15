@@ -16,6 +16,13 @@
         </MudText>
 
         <MudButton Variant="Variant.Outlined"
+                   Color="Color.Warning"
+                   StartIcon="@Icons.Material.Outlined.ArrowBack"
+                   OnClick="NavigateBack">
+            Campaign Info
+        </MudButton>
+
+        <MudButton Variant="Variant.Outlined"
                    Color="Color.Info"
                    StartIcon="@Icons.Material.Filled.AttachFile"
                    OnClick="AddDocument">
@@ -119,6 +126,11 @@
     private void AddDocument()
     {
 
+    }
+
+    private void NavigateBack()
+    {
+        NavigationManager.NavigateTo($"/campaigns/{CampaignId}");
     }
 
     private void UpdateSelectedReference(int fileId)

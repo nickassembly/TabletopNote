@@ -15,6 +15,13 @@
             Documents
         </MudText>
 
+        <MudButton Variant="Variant.Outlined"
+                   Color="Color.Warning"
+                   StartIcon="@Icons.Material.Outlined.ArrowBack"
+                   OnClick="NavigateBack">
+            Campaign Info
+        </MudButton>
+
         <MudButton Variant="Variant.Filled"
                    Color="Color.Primary"
                    StartIcon="@Icons.Material.Filled.Add"
@@ -81,7 +88,7 @@
     }
 </MudStack>
 
-    @code {
+@code {
     [Parameter]
     public int CampaignId { get; set; }
 
@@ -117,6 +124,11 @@
             "table" => Icons.Material.Filled.TableChart,
             _ => Icons.Material.Filled.EventNote
         };
+    }
+
+    private void NavigateBack()
+    {
+        NavigationManager.NavigateTo($"/campaigns/{CampaignId}");
     }
 
     async Task DeleteCampaignDocument(int campaignId, int documentId)

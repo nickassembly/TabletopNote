@@ -7,8 +7,19 @@
 @using TabletopNote.UI.ViewModels
 @inject DocumentsApiClient DocumentsApi
 @inject NavigationManager NavigationManager
+@inject UserTimeService UserTimeService
+@inject IDialogService DialogService
 
 <PageTitle>Document</PageTitle>
+
+@if (!IsNewDocument)
+{
+    <MudDrawer Open="true" Elevation="1" Width="260px" ClipMode="DrawerClipMode.Never">
+        <MudNavMenu Dense="true" Class="pa-2">
+            <CampaignSectionNav CampaignId="@CampaignId" IsHorizontal="false" ButtonSize="Size.Medium" IconSize="Size.Medium" />
+        </MudNavMenu>
+    </MudDrawer>
+}
 
 <MudMainContent Class="pa-6">
     <MudPaper Elevation="4" Class="pa-6 mx-auto"
@@ -16,7 +27,7 @@
 
         <MudStack Spacing="3">
             <MudText Typo="Typo.h4" Color="Color.Primary">
-                @(IsNewDocument ? "New Document" : $"{Document.DocumentName}")
+                @(IsNewDocument ? "New Document" : Document.DocumentName)
             </MudText>
 
             <MudForm @ref="_form">
@@ -24,7 +35,6 @@
                                 @bind-Value="Document.DocumentContentType"
                                 Color="Color.Primary"
                                 Mandatory="true">
-
                     <MudToggleItem Value="DocumentContentType.Note">
                         <MudIcon Icon="@Icons.Material.Filled.Description" Class="me-1" />
                         Note
@@ -52,12 +62,6 @@
                                   Variant="Variant.Outlined" />
                 }
 
-
-                @* Todo - Implement Table content type https://mudblazor.com/components/table#api
-                Will need to craete separate page, likely update how we store document content to support complex data structure.
-                 1. Create Table Editor component/page
-                 2. Update DocumentVM to handle Table data structure
-                 3. Update save/load logic to serialize/deserialize table data *@
                 @if (Document.DocumentContentType == DocumentContentType.Table)
                 {
                     <MudText Typo="Typo.h6" Color="Color.Primary">
@@ -67,21 +71,24 @@
 
                 @if (Document.DocumentContentType == DocumentContentType.Note)
                 {
-                    @* TODO - update form to have back to documents navigation on left, expand rest of page to be wider 75%ish of page*@
                     <MudTextField @bind-Value="Document.DocumentContent"
                                   Label="Content"
                                   Lines="30"
                                   Variant="Variant.Outlined" />
                 }
 
-                <MudText Typo="Typo.body1" Color="Color.Primary">
-                    @* TODO - update to reflect correct time per local time of user..seems to show GMT *@
-                    Last Updated : @(Document.DocumentUpdatedAt) [Created on: @(Document.DocumentCreatedAt)]
-                </MudText>
+                @if (!IsNewDocument)
+                {
+                    <MudText>
+                        Last Update: @userLocalUpdatedAt?.ToString("g")
+                    </MudText>
 
-                <MudStack Direction="Row"
-                          JustifyContent="SpaceBetween"
-                          Class="mt-4">
+                    <MudText>
+                        Created at: @userLocalCreatedAt?.ToString("g")
+                    </MudText>
+                }
+
+                <MudStack Direction="Row" JustifyContent="SpaceBetween" Class="mt-4">
                     <MudButton Variant="Variant.Text"
                                Color="Color.Secondary"
                                OnClick="Cancel">
@@ -99,20 +106,17 @@
     </MudPaper>
 </MudMainContent>
 
-
 @code {
-    [Parameter]
-    public int DocumentId { get; set; }
-
-    [Parameter]
-    public int CampaignId { get; set; }
-
     private MudForm _form = null!;
 
+    private DateTime? userLocalCreatedAt;
+    private DateTime? userLocalUpdatedAt;
+
+    [Parameter] public int DocumentId { get; set; }
+    [Parameter] public int CampaignId { get; set; }
+
     private bool IsNewDocument => DocumentId == 0;
-
-    DocumentVM Document { get; set; } = new();
-
+    private DocumentVM Document { get; set; } = new();
     protected override async Task OnInitializedAsync()
     {
         if (IsNewDocument)
@@ -125,7 +129,6 @@
                 DocumentContentType = 0,
                 DocumentContent = string.Empty
             };
-
         }
         else
         {
@@ -146,6 +149,17 @@
         }
     }
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var tz = await UserTimeService.GetUserTimeZoneAsync();
+            userLocalCreatedAt = UserTimeService.ConvertUtcToUserTime(Document.DocumentCreatedAt, tz);
+            userLocalUpdatedAt = UserTimeService.ConvertUtcToUserTime(Document.DocumentUpdatedAt, tz);
+            StateHasChanged();
+        }
+    }
+
     private async Task SaveCampaignDocument()
     {
         if (IsNewDocument)
@@ -160,14 +174,11 @@
             };
 
             await DocumentsApi.AddCampaignDocument(CampaignId, campaignDocumentToAdd);
-
-            NavigationManager.NavigateTo($"/campaigns/{Document.CampaignId}/documents");
         }
         else
         {
             var campaignDocumentToUpdate = new CampaignDocumentUpdateDto
             {
-                
                 DocumentName = Document.DocumentName,
                 DocumentDescription = Document.DocumentDescription,
                 DocumentContentType = Document.DocumentContentType,
@@ -175,10 +186,9 @@
             };
 
             await DocumentsApi.UpdateCampaignDocument(CampaignId, DocumentId, campaignDocumentToUpdate);
-
-            // navigates back to page that was being edited
-            NavigationManager.NavigateTo($"/campaigns/{Document.CampaignId}/documents/{Document.DocumentId}");
         }
+
+        NavigationManager.NavigateTo($"/campaigns/{Document.CampaignId}/documents");
     }
 
     private void Cancel()
