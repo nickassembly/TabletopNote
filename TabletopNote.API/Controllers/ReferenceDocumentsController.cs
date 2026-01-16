@@ -92,7 +92,7 @@ namespace TabletopNote.API.Controllers
                 CampaignId = campaignId,
                 ReferenceFileName = newReferenceDocument.ReferenceFileName,
                 FileDescription = newReferenceDocument.FileDescription,
-                FilePath = newReferenceDocument.FilePath,
+                FilePath = newReferenceDocument.FilePath, 
                 Url = newReferenceDocument.Url,
                 IsGMVisibleOnly = newReferenceDocument.IsGMVisibleOnly
             };
@@ -102,9 +102,9 @@ namespace TabletopNote.API.Controllers
             await _context.SaveChangesAsync();
 
             return CreatedAtAction(
-                nameof(AddReferenceDocument),
-                new { campaignId, id = referenceDocumentToAdd.FileId },
-                null
+                nameof(GetReferenceDocumentById),
+                new { campaignId, fileId = referenceDocumentToAdd.FileId },
+                referenceDocumentToAdd
             );
         }
 

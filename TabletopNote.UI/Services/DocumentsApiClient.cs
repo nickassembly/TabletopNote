@@ -18,7 +18,8 @@ namespace TabletopNote.UI.Clients
             ) ?? throw new InvalidOperationException("No response");
         }
 
-        // TODO - Add Error Handling
+        // TODO - Add Error Handling and ensure DTO validation
+        // invalid dtos will throw excpetions i.e. update with less than 3 characters for a description
         public async Task<CampaignDto> AddCampaign(CampaignAddDto campaignToAdd)
         {
             var response = await _http.PostAsJsonAsync(

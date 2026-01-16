@@ -16,6 +16,10 @@
             Attachments &amp; References
         </MudText>
 
+        <MudText Typo="Typo.body1" Color="Color.Info">
+            Local files and URL links related to the campaign. Attach new files here, or click on existing references for more information.
+        </MudText>
+
         <MudButton Variant="Variant.Outlined"
                    Color="Color.Warning"
                    StartIcon="@Icons.Material.Outlined.ArrowBack"
@@ -37,15 +41,15 @@
     }
     else
     {
-        <MudGrid Spacing="3">
+        <MudGrid Spacing="2">
             @foreach (var reference in State.Page.ReferenceDocuments)
             {
-                <MudItem xs="12" sm="6" md="4">
+                <MudItem xs="12" sm="6" md="4" lg="4" xl="4">
                     <MudStack AlignItems="AlignItems.Center">
 
                         <MudPaper Outlined="true"
-                                  Class="pa-4"
-                                  Style="border-radius:12px; display:inline-block;">
+                                  Class="pa-4 mx-auto reference-outline"
+                                  Style="height:100%; max-width:420px; background-color:#1E1E1E; border-radius:12px; border-color:rgb(50,153,255)">
 
                             <MudStack Spacing="2"
                                       AlignItems="AlignItems.Center"
@@ -82,17 +86,46 @@
                                         <MudIcon Icon="@Icons.Material.Filled.AttachFile"
                                                  Size="Size.Small"
                                                  Class="me-1" />
-                                        Uploaded File
+                                        @reference.FilePath
                                     </MudText>
                                 }
 
                                 <MudDivider Class="my-2" />
 
-                                <MudButton Variant="Variant.Text"
-                                           Color="Color.Info"
-                                           StartIcon="@Icons.Material.Filled.Edit">
-                                    Update Reference
+                                <MudStack Direction="Row" Width="100%">
+                                    <MudButton FullWidth="true"
+                                               StartIcon="@Icons.Material.Filled.Edit"
+                                               Color="Color.Info"
+                                               Variant="Variant.Text"
+                                               OnClick="() => UpdateSelectedReference(reference.FileId)">
+                                        Edit
+                                    </MudButton>
+
+                                    <MudDivider Vertical="true" FlexItem="true" />
+
+                                    <MudButton FullWidth="true"
+                                               StartIcon="@Icons.Material.Filled.Delete"
+                                               Color="Color.Error"
+                                               Variant="Variant.Text"
+                                               OnClick="() => DeleteCampaignReference(CampaignId, reference.FileId)">
+                                        Delete
+                                    </MudButton>
+                                </MudStack>
+
+                               @*  <MudButton Variant="Variant.Outlined"
+                                           Color="Color.Primary"
+                                           StartIcon="@Icons.Material.Filled.OpenInNew"
+                                           OnClick="@(() => UpdateSelectedReference(reference.FileId))"
+                                           >
                                 </MudButton>
+
+                                <MudCardActions Class="justify-end">
+                                    <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                                   Size="Size.Small"
+                                                   Color="Color.Error"
+                                                   StopPropagation="true"
+                                                   OnClick="() => DeleteCampaignReference(CampaignId, reference.FileId)" />
+                                </MudCardActions> *@
 
                             </MudStack>
                         </MudPaper>
@@ -137,6 +170,21 @@
     private void UpdateSelectedReference(int fileId)
     {
         NavigationManager.NavigateTo($"/campaigns/{CampaignId}/references/{fileId}");
+    }
+
+    async Task DeleteCampaignReference(int campaignId, int fileId)
+    {
+        await DocumentsApi.DeleteReferenceDocument(campaignId, fileId);
+
+        var referenceToRemove = State.Page?.ReferenceDocuments
+            .FirstOrDefault(r => r.FileId == fileId && r.CampaignId == campaignId);
+
+        if (referenceToRemove != null)
+        {
+            State.Page?.ReferenceDocuments.Remove(referenceToRemove);
+        }
+
+        StateHasChanged();
     }
 
     private string GetReferenceIcon(ReferenceDocumentVM reference)

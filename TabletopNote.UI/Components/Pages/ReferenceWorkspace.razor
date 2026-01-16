@@ -37,26 +37,19 @@
                               Variant="Variant.Outlined" />
 
                 <MudTextField @bind-Value="Reference.FileDescription"
-                              Label="File Description"
+                              Label="Summary of Content"
                               Required="true"
                               For="@(() => Reference.FileDescription)"
                               Lines="3"
                               Variant="Variant.Outlined" />
 
-                @*   TODO - integrate into File Upload Component then Remove *@
-                @* <MudTextField @bind-Value="Reference.FilePath"
-                              Label="Enter File Path"
-                              For="@(() => Reference.FilePath)"
-                              Variant="Variant.Outlined" /> *@
-
-                @* File Upload *@
-                @* Component input should be file path, stored as Reference.FilePath*@
+                @* TODO - Add functionality (currently only saves file path) *@
                 <MudStack Style="width: 100%">
-                    <MudFileUpload T="IReadOnlyList<IBrowserFile>"
+                    <MudFileUpload T="IBrowserFile"
                                    @ref="@_fileUpload"
                                    OnFilesChanged="OnInputFileChanged"
-                                   AppendMultipleFiles
                                    Hidden="@false"
+                                   AppendMultipleFiles="false"
                                    InputClass="file-upload-input"
                                    tabindex="-1"
                                    @ondrop="@ClearDragClass"
@@ -68,7 +61,7 @@
                                       Outlined="true"
                                       Class="@_dragClass">
                                 <MudText Typo="Typo.h6">
-                                    Drag and drop files here or click
+                                    Click or drag to capture file path.
                                 </MudText>
                                 @foreach (var file in _fileNames)
                                 {
@@ -83,22 +76,17 @@
                     <MudToolBar Gutters="@false"
                                 Class="relative d-flex justify-end gap-4">
                         <MudButton Color="Color.Primary"
-                                   OnClick="@OpenFilePickerAsync"
-                                   Variant="Variant.Filled">
-                            Open file picker
-                        </MudButton>
-                        <MudButton Color="Color.Primary"
-                                   Disabled="@(!_fileNames.Any())"
-                                   OnClick="@Upload"
-                                   Variant="Variant.Filled">
+                                   Disabled="@(_fileUploaded || _selectedFile is null)"
+                                   OnClick="@Upload">
                             Attach File
                         </MudButton>
+
                         <MudButton Color="Color.Error"
-                                   Disabled="@(!_fileNames.Any())"
-                                   OnClick="@ClearAsync"
-                                   Variant="Variant.Filled">
+                                   Disabled="@(_fileUploaded)"
+                                   OnClick="@ClearAsync">
                             Clear
                         </MudButton>
+
                     </MudToolBar>
                 </MudStack>
 
@@ -121,6 +109,9 @@
 </MudMainContent>
 
 @code {
+    private bool _fileUploaded = false;
+    private IBrowserFile? _selectedFile;
+
     private MudForm _form = null!;
 
     [Parameter] public int FileId { get; set; }
@@ -193,11 +184,11 @@
     }
 
     // file  upload logic
-    #nullable enable
+#nullable enable
     private const string DefaultDragClass = "relative rounded-lg border-2 border-dashed pa-4 mt-4 mud-width-full mud-height-full";
     private string _dragClass = DefaultDragClass;
     private readonly List<string> _fileNames = new();
-    private MudFileUpload<IReadOnlyList<IBrowserFile>>? _fileUpload;
+    private MudFileUpload<IBrowserFile>? _fileUpload;
 
     private async Task ClearAsync()
     {
@@ -211,19 +202,33 @@
 
     private void OnInputFileChanged(InputFileChangeEventArgs e)
     {
+        if (_fileUploaded)
+            return;
+
         ClearDragClass();
-        var files = e.GetMultipleFiles();
-        foreach (var file in files)
-        {
-            _fileNames.Add(file.Name);
-        }
+
+        _selectedFile = e.File;
+        _fileNames.Clear();
+        _fileNames.Add(_selectedFile.Name);
     }
 
-    private void Upload()
+
+
+    private async Task Upload()
     {
-        // Upload the files here
-        Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
-        Snackbar.Add("TODO: Upload your files!");
+        if (_selectedFile is null || _fileUploaded)
+            return;
+
+        // TODO - Add functionality to upload actual file or open file in a reader.
+        // (Currently just capturing file path as string)
+        Reference.FilePath = _selectedFile.Name;
+
+        _fileUploaded = true;
+        _selectedFile = null;
+
+        Snackbar.Add("File uploaded successfully.", Severity.Success);
+
+        StateHasChanged();
     }
 
     private void SetDragClass()
