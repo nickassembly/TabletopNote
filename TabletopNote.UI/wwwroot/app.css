@@ -119,13 +119,3 @@ h1:focus {
     z-index: 10;
     opacity: 0;
 }
-
-.document-outline {
-    border-color: var(--mud-palette-primary);
-}
-
-.reference-outline {
-    border-color: var(--mud-palette-secondary);
-}
-
-
