@@ -1,0 +1,162 @@
+﻿@page "/campaigns/{CampaignId:int}/events/{CalendarEventId:int}"
+@page "/campaigns/{CampaignId:int}/events/new"
+
+@using TabletopNote.Core.Models
+@using TabletopNote.Shared.Dto
+@using TabletopNote.UI.Clients
+@using TabletopNote.UI.ViewModels
+@inject DocumentsApiClient DocumentsApi
+@inject NavigationManager NavigationManager
+@inject UserTimeService UserTimeService
+
+<PageTitle>Event</PageTitle>
+
+@if (!IsNewEvent)
+{
+    <MudDrawer Open="true" Elevation="1" Width="260px" ClipMode="DrawerClipMode.Never">
+        <MudNavMenu Dense="true" Class="pa-2">
+            <CampaignSectionNav CampaignId="@CampaignId" IsHorizontal="false" ButtonSize="Size.Medium" IconSize="Size.Medium" />
+        </MudNavMenu>
+    </MudDrawer>
+}
+
+<MudMainContent Class="pa-6">
+    <MudPaper Elevation="4" Class="pa-6 mx-auto"
+              Style="max-width:900px; border-radius:12px; background-color:#1E1E1E;">
+
+        <MudStack Spacing="3">
+            <MudText Typo="Typo.h4" Color="Color.Primary">
+                @(IsNewEvent ? "New Event" : CalendarEvent.EventName)
+            </MudText>
+
+            <MudForm @ref="_form">
+
+                <MudStack Spacing="3">
+                    <MudDatePicker Label="Event Start Date"
+                                   @bind-Date="CalendarEvent.EventStartDate"
+                                   ShowToolbar="false" />
+
+                    <MudDatePicker Label="Event End Date"
+                                   @bind-Date="CalendarEvent.EventEndDate"
+                                   ShowToolbar="false" />
+
+                    <MudTextField @bind-Value="CalendarEvent.EventName"
+                                  Label="Event Name"
+                                  Required="true"
+                                  For="@(() => CalendarEvent.EventName)"
+                                  Variant="Variant.Outlined" />
+
+                    <MudTextField @bind-Value="CalendarEvent.EventDescription"
+                                  Label="Summary"
+                                  Lines="3"
+                                  Variant="Variant.Outlined" />
+                </MudStack>
+
+                <MudDivider Class="my-4" />
+
+                <MudStack Direction="Row" JustifyContent="SpaceBetween" Class="mt-4">
+                    <MudButton Variant="Variant.Text"
+                               Color="Color.Secondary"
+                               OnClick="Cancel">
+                        Cancel
+                    </MudButton>
+
+                    <MudButton Variant="Variant.Filled"
+                               Color="Color.Primary"
+                               OnClick="SaveCalendarEvent">
+                        Save
+                    </MudButton>
+                </MudStack>
+            </MudForm>
+        </MudStack>
+    </MudPaper>
+</MudMainContent>
+
+@code {
+    private MudForm _form = null!;
+    private DateTime? _localStartDate;
+    private DateTime? _localEndDate;
+ 
+
+    [Parameter] public int CalendarEventId { get; set; }
+    [Parameter] public int CampaignId { get; set; }
+
+    private bool IsNewEvent => CalendarEventId == 0;
+    private CalendarEventVM CalendarEvent { get; set; } = new();
+    protected override async Task OnInitializedAsync()
+    {
+
+        if (IsNewEvent)
+        {
+            CalendarEvent = new CalendarEventVM
+            {
+                CampaignId = CampaignId,
+                EventName = string.Empty,
+                EventDescription = string.Empty,
+                EventStartDate = DateTime.UtcNow,
+                EventEndDate = DateTime.UtcNow.AddHours(1)
+            };
+        }
+        else
+        {
+            var dto = await DocumentsApi.GetCalendarEventById(CampaignId, CalendarEventId);
+
+            CalendarEvent = new CalendarEventVM
+            {
+                CalendarEventId = dto.CalendarEventId,
+                CampaignId = dto.CampaignId,
+                EventName = dto.EventName,
+                EventDescription = dto.EventDescription,
+                EventStartDate = dto.EventStartDate,
+                EventEndDate = dto.EventEndDate
+            };
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var tz = await UserTimeService.GetUserTimeZoneAsync();
+            _localStartDate = UserTimeService.ConvertUtcToUserTime(CalendarEvent.EventStartDate!.Value, tz);
+            _localEndDate = UserTimeService.ConvertUtcToUserTime(CalendarEvent.EventEndDate!.Value, tz);
+
+        }
+    }
+
+    private async Task SaveCalendarEvent()
+    {
+        if (IsNewEvent)
+        {
+            var calendarEventToAdd = new CalendarEventAddDto
+            {
+                CampaignId = CalendarEvent.CampaignId,
+                EventName = CalendarEvent.EventName,
+                EventDescription = CalendarEvent.EventDescription,
+                EventStartDate = CalendarEvent.EventStartDate!.Value,
+                EventEndDate = CalendarEvent.EventEndDate!.Value
+            };
+
+            await DocumentsApi.AddCalendarEvent(CampaignId, calendarEventToAdd);
+        }
+        else
+        {
+            var calendarEventToUpdate = new CalendarEventUpdateDto
+            {
+                EventName = CalendarEvent.EventName,
+                EventDescription = CalendarEvent.EventDescription,
+                EventStartDate = CalendarEvent.EventStartDate!.Value,
+                EventEndDate = CalendarEvent.EventEndDate!.Value
+            };
+
+            await DocumentsApi.UpdateCalendarEvent(CampaignId, CalendarEventId, calendarEventToUpdate);
+        }
+
+        NavigationManager.NavigateTo($"/campaigns/{CalendarEvent.CampaignId}/events");
+    }
+
+    private void Cancel()
+    {
+        NavigationManager.NavigateTo($"/campaigns/{CalendarEvent.CampaignId}/events");
+    }
+}

@@ -4,6 +4,8 @@ namespace TabletopNote.Shared.Dto
 {
     public class CalendarEventAddDto
     {
+        public int CampaignId { get; set; }
+
         [Required]
         [MinLength(3, ErrorMessage = "Event name must be at least 3 characters long.")]
         [MaxLength(100, ErrorMessage = "Event name cannot exceed 100 characters.")]

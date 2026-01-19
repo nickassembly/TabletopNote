@@ -34,6 +34,7 @@ namespace TabletopNote.API.Controllers
             {
                 calendarEventDtos.Add(new CalendarEventDto
                 {
+                    CampaignId = calendarEvent.CampaignId,
                     CalendarEventId = calendarEvent.CalendarEventId,
                     EventName = calendarEvent.EventName,
                     EventDescription = calendarEvent.EventDescription,
@@ -55,7 +56,7 @@ namespace TabletopNote.API.Controllers
 
         [HttpGet("{calendarEventId}")]
         // GET - /campaigns/{campaignId}/events/{calendarEventId}
-        public async Task<ActionResult<CalendarEventDto>> GetReferenceDocumentById(
+        public async Task<ActionResult<CalendarEventDto>> GetCalendarEventById(
             [FromRoute] int campaignId,
             [FromRoute] int calendarEventId)
         {
@@ -102,7 +103,7 @@ namespace TabletopNote.API.Controllers
             return CreatedAtAction(
                 nameof(AddCalendarEvent),
                 new { campaignId, id = calendarEventToAdd.CalendarEventId },
-                null
+                calendarEventToAdd
             );
         }
 

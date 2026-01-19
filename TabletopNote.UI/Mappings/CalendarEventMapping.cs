@@ -10,12 +10,13 @@ namespace TabletopNote.UI.Mappings
         {
             return new CalendarEventVM
             {
-              CalendarEventId = dto.CalendarEventId,
-              EventName = dto.EventName,
-              EventDescription = dto.EventDescription,
-              EventStartDate = dto.EventStartDate,
-              EventEndDate = dto.EventEndDate,
-              IsGMVisibleOnly = dto.IsGMVisibleOnly
+                CampaignId = dto.CampaignId,
+                CalendarEventId = dto.CalendarEventId,
+                EventName = dto.EventName,
+                EventDescription = dto.EventDescription,
+                EventStartDate = dto.EventStartDate,
+                EventEndDate = dto.EventEndDate,
+                IsGMVisibleOnly = dto.IsGMVisibleOnly
             };
         }
     }

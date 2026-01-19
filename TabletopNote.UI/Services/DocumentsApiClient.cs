@@ -166,5 +166,47 @@ namespace TabletopNote.UI.Clients
                 $"campaigns/{campaignId}/events"
             ) ?? throw new InvalidOperationException("No response");
         }
+
+        public async Task<CalendarEventDto> GetCalendarEventById(int campaignId, int calendarEventId)
+        {
+            return await _http.GetFromJsonAsync<CalendarEventDto>(
+                $"/campaigns/{campaignId}/events/{calendarEventId}"
+            ) ?? throw new InvalidOperationException("No response");
+        }
+
+        public async Task<CalendarEventDto> AddCalendarEvent(int campaignId, CalendarEventAddDto calendarEventToAdd)
+        {
+            var response = await _http.PostAsJsonAsync(
+               $"/campaigns/{campaignId}/events", calendarEventToAdd
+           );
+
+            if (!response.IsSuccessStatusCode)
+                throw new HttpRequestException($"Failed to add new event");
+
+            var document = await response.Content.ReadFromJsonAsync<CalendarEventDto>();
+
+            return document
+                ?? throw new InvalidOperationException("No calendar event returned");
+        }
+
+        public async Task UpdateCalendarEvent(int campaignId, int calendarEventId, CalendarEventUpdateDto calendarEventToUpdate)
+        {
+            var response = await _http.PutAsJsonAsync(
+                $"/campaigns/{campaignId}/events/{calendarEventId}", calendarEventToUpdate
+            );
+
+            if (!response.IsSuccessStatusCode)
+                throw new HttpRequestException($"Failed to update event: {calendarEventToUpdate.EventName}");
+        }
+
+        public async Task DeleteCalendarEvent(int campaignId, int calendarEventId)
+        {
+            var response = await _http.DeleteAsync(
+                $"/campaigns/{campaignId}/events/{calendarEventId}"
+            );
+
+            if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+                throw new KeyNotFoundException($"Event with ID {calendarEventId} not found.");
+        }
     }
 }

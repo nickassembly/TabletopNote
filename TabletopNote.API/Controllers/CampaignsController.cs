@@ -67,6 +67,7 @@ namespace TabletopNote.API.Controllers
                     CalendarEvents = campaign.CalendarEvents
                     .Select(e => new CalendarEventDto
                     {
+                        CampaignId = e.CampaignId,
                         CalendarEventId = e.CalendarEventId,
                         EventName = e.EventName,
                         EventDescription = e.EventDescription,
@@ -127,6 +128,7 @@ namespace TabletopNote.API.Controllers
                 CalendarEvents = campaign.CalendarEvents
                     .Select(e => new CalendarEventDto
                     {
+                        CampaignId = e.CampaignId,
                         CalendarEventId = e.CalendarEventId,
                         EventName = e.EventName,
                         EventDescription = e.EventDescription,

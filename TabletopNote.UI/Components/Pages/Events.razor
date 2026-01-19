@@ -38,7 +38,7 @@ else
         <MudTimeline 
             Reverse="false"
             Class="centered-timeline">
-            @foreach (var ev in State.Page.CalendarEvents.OrderBy(e => e.EventStartDate))
+            @foreach (var campaignEvent in State.Page.CalendarEvents.OrderBy(e => e.EventStartDate))
             {
                 <MudTimelineItem Color="Color.Primary"
                                  Icon="@Icons.Material.Filled.Event">
@@ -56,10 +56,10 @@ else
                                     <MudIcon Icon="@Icons.Material.Filled.Schedule"
                                              Size="Size.Small"
                                              Class="me-1" />
-                                    @FormatEventDate(ev)
+                                    @FormatEventDate(campaignEvent)
                                 </MudText>
 
-                                @if (ev.EventEndDate.Date != ev.EventStartDate.Date)
+                                @if (campaignEvent.EventEndDate!.Value != campaignEvent.EventStartDate!.Value)
                                 {
                                     <MudChip T="string"
                                              Size="Size.Small"
@@ -71,11 +71,11 @@ else
                             </MudStack>
 
                             <MudText Typo="Typo.subtitle1">
-                                @ev.EventName
+                                @campaignEvent.EventName
                             </MudText>
 
                             <MudText Typo="Typo.body2" Color="Color.Secondary">
-                                @ev.EventDescription
+                                @campaignEvent.EventDescription
                             </MudText>
 
                             <MudStack Direction="Row"
@@ -85,7 +85,7 @@ else
                                            Size="Size.Small"
                                            Color="Color.Primary"
                                            StartIcon="@Icons.Material.Filled.Edit"
-                                           OnClick="() => UpdateSelectedEvent(ev)">
+                                           OnClick="() => UpdateSelectedEvent(campaignEvent.CalendarEventId)">
                                     View / Edit
                                 </MudButton>
                             </MudStack>
@@ -117,7 +117,12 @@ else
 
     private void AddEvent()
     {
+        NavigationManager.NavigateTo($"campaigns/{CampaignId}/events/new");
+    }
 
+    private void UpdateSelectedEvent(int calendarEventId)
+    {
+        NavigationManager.NavigateTo($"campaigns/{CampaignId}/events/{calendarEventId}");
     }
 
     private void NavigateBack()
@@ -125,18 +130,31 @@ else
         NavigationManager.NavigateTo($"/campaigns/{CampaignId}");
     }
 
-    private void UpdateSelectedEvent(CalendarEventVM ev)
-    {
-        NavigationManager.NavigateTo($"/campaigns/{CampaignId}/events/{ev.CalendarEventId}");
-    }
-
     private string FormatEventDate(CalendarEventVM ev)
     {
-        if (ev.EventEndDate.Date == ev.EventStartDate.Date)
+        if (ev.EventStartDate is not DateTime start ||
+            ev.EventEndDate is not DateTime end)
+            return string.Empty;
+
+        if (start.Date == end.Date)
+            return start.ToString("MMM dd, yyyy");
+
+        return $"{start:MMM dd} – {end:MMM dd, yyyy}";
+    }
+
+    async Task DeleteCalendarEvent(int campaignId, int calendarEventId)
+    {
+        await DocumentsApi.DeleteCalendarEvent(campaignId, calendarEventId);
+
+        var eventToRemove = State.Page?.CalendarEvents
+            .FirstOrDefault(r => r.CalendarEventId == calendarEventId && r.CampaignId == campaignId);
+
+        if (eventToRemove != null)
         {
-            return ev.EventStartDate.ToString("MMM dd, yyyy");
+            State.Page?.CalendarEvents.Remove(eventToRemove);
         }
 
-        return $"{ev.EventStartDate:MMM dd} – {ev.EventEndDate:MMM dd, yyyy}";
+        StateHasChanged();
     }
+
 }

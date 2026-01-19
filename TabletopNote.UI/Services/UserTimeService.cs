@@ -23,6 +23,14 @@ namespace TabletopNote.UI.Clients
         {
             return TimeZoneInfo.ConvertTimeFromUtc(utc, tz);
         }
+
+        public DateTime ConvertUserTimeToUtc(DateTime userLocalTime, TimeZoneInfo tz)
+        {
+            var unspecified = DateTime.SpecifyKind(userLocalTime, DateTimeKind.Unspecified);
+
+            return TimeZoneInfo.ConvertTimeToUtc(unspecified, tz);
+        }
+
     }
 
 
