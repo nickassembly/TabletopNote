@@ -1,16 +1,26 @@
 using Microsoft.EntityFrameworkCore;
 using TabletopNote.Data;
+using Microsoft.Data.Sqlite;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+var connectionString = builder.Configuration.GetConnectionString("Default");
+
 builder.Services.AddDbContext<TabletopNoteDbContext>(options =>
 {
     options.UseSqlite(
-        builder.Configuration.GetConnectionString("Default"),
-        sqlite => sqlite.MigrationsAssembly("TabletopNote.Data")
+        connectionString,
+        sqlite => sqlite.MigrationsAssembly("TabletopNote.Data").CommandTimeout(30)
     );
 });
+
+var dataSource = new SqliteConnectionStringBuilder(connectionString).DataSource;
+var dbDirectory = Path.GetDirectoryName(dataSource);
+
+if (!string.IsNullOrEmpty(dbDirectory) && !Directory.Exists(dbDirectory))
+{
+    Directory.CreateDirectory(dbDirectory);
+}
 
 builder.Services.AddControllers();
 
@@ -22,6 +32,11 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
+
+// Apply pending migrations at startup
+using var scope = app.Services.CreateScope();
+var db = scope.ServiceProvider.GetRequiredService<TabletopNoteDbContext>();
+db.Database.Migrate();
 
 app.UseHttpsRedirection();
 
