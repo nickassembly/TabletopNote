@@ -29,7 +29,7 @@
                 @(IsNewEvent ? "New Event" : CalendarEvent.EventName)
             </MudText>
 
-            <MudForm @ref="_form">
+            <MudForm @ref="_form" Model="CalendarEvent">
 
                 <MudStack Spacing="3">
                     <MudDatePicker Label="Event Start Date"
@@ -41,12 +41,16 @@
                                    ShowToolbar="false" />
 
                     <MudTextField @bind-Value="CalendarEvent.EventName"
-                                  Label="Event Name"
-                                  Required="true"
                                   For="@(() => CalendarEvent.EventName)"
+                                  Required="true"
+                                  MaxLength="100"
+                                  Label="Event Name"
                                   Variant="Variant.Outlined" />
 
                     <MudTextField @bind-Value="CalendarEvent.EventDescription"
+                                  For="@(() => CalendarEvent.EventDescription)"
+                                  Required="false"
+                                  MaxLength="2000"
                                   Label="Summary"
                                   Lines="3"
                                   Variant="Variant.Outlined" />
@@ -92,7 +96,6 @@
             {
                 CampaignId = CampaignId,
                 EventName = string.Empty,
-                EventDescription = string.Empty,
                 EventStartDate = DateTime.UtcNow,
                 EventEndDate = DateTime.UtcNow.AddHours(1)
             };
@@ -106,7 +109,7 @@
                 CalendarEventId = dto.CalendarEventId,
                 CampaignId = dto.CampaignId,
                 EventName = dto.EventName,
-                EventDescription = dto.EventDescription,
+                EventDescription = string.IsNullOrWhiteSpace(dto.EventDescription) ? null : dto.EventDescription,
                 EventStartDate = dto.EventStartDate,
                 EventEndDate = dto.EventEndDate
             };
@@ -132,7 +135,7 @@
             {
                 CampaignId = CalendarEvent.CampaignId,
                 EventName = CalendarEvent.EventName,
-                EventDescription = CalendarEvent.EventDescription,
+                EventDescription = string.IsNullOrWhiteSpace(CalendarEvent.EventDescription) ? null : CalendarEvent.EventDescription,
                 EventStartDate = CalendarEvent.EventStartDate!.Value,
                 EventEndDate = CalendarEvent.EventEndDate!.Value
             };
@@ -144,7 +147,7 @@
             var calendarEventToUpdate = new CalendarEventUpdateDto
             {
                 EventName = CalendarEvent.EventName,
-                EventDescription = CalendarEvent.EventDescription,
+                EventDescription = string.IsNullOrWhiteSpace(CalendarEvent.EventDescription) ? null : CalendarEvent.EventDescription,
                 EventStartDate = CalendarEvent.EventStartDate!.Value,
                 EventEndDate = CalendarEvent.EventEndDate!.Value
             };

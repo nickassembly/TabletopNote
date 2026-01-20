@@ -10,13 +10,13 @@ namespace TabletopNote.UI.Mappings
         {
             return new ReferenceDocumentVM
             {
-               CampaignId = dto.CampaignId,
-               FileId = dto.FileId,
-               ReferenceFileName = dto.ReferenceFileName,
-               FileDescription = dto.FileDescription,
-               FilePath = dto.FilePath,
-               Url = dto.Url,
-               IsGMVisibleOnly = dto.IsGMVisibleOnly
+                CampaignId = dto.CampaignId,
+                FileId = dto.FileId,
+                ReferenceFileName = dto.ReferenceFileName,
+                FileDescription = dto.FileDescription,
+                FilePath = dto.FilePath,
+                Url = dto.Url,
+                IsGMVisibleOnly = dto.IsGMVisibleOnly
             };
         }
     }

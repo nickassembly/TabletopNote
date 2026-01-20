@@ -13,7 +13,7 @@ namespace TabletopNote.Shared.Dto
 
         [MinLength(3, ErrorMessage = "Event description must be at least 3 characters long.")]
         [MaxLength(2000, ErrorMessage = "Event description cannot exceed 2000 characters.")]
-        public string EventDescription { get; set; } = string.Empty;
+        public string? EventDescription { get; set; }
         public DateTime EventStartDate { get; set; }
         public DateTime EventEndDate { get; set; }
         public bool IsGMVisibleOnly { get; set; }

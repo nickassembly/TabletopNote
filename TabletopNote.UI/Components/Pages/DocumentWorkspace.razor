@@ -29,7 +29,7 @@
                 @(IsNewDocument ? "New Document" : Document.DocumentName)
             </MudText>
 
-            <MudForm @ref="_form">
+            <MudForm @ref="_form" Model="Document">
                 <MudToggleGroup T="DocumentContentType"
                                 @bind-Value="Document.DocumentContentType"
                                 Color="Color.Primary"
@@ -49,17 +49,17 @@
 
                 <MudTextField @bind-Value="Document.DocumentName"
                               Label="Title"
-                              Required="true"
                               For="@(() => Document.DocumentName)"
+                              Required="true"
+                              MaxLength="100"
                               Variant="Variant.Outlined" />
 
-                @if (Document.DocumentDescription != null)
-                {
-                    <MudTextField @bind-Value="Document.DocumentDescription"
-                                  Label="Summary"
-                                  Lines="3"
-                                  Variant="Variant.Outlined" />
-                }
+                <MudTextField @bind-Value="Document.DocumentDescription"
+                              Label="Summary"
+                              For="@(() => Document.DocumentDescription)"
+                              MaxLength="2000"
+                              Lines="3"
+                              Variant="Variant.Outlined" />
 
                 @if (Document.DocumentContentType == DocumentContentType.Table)
                 {
@@ -124,7 +124,6 @@
             {
                 CampaignId = CampaignId,
                 DocumentName = string.Empty,
-                DocumentDescription = string.Empty,
                 DocumentContentType = 0,
                 DocumentContent = string.Empty
             };
@@ -138,7 +137,7 @@
                 DocumentId = dto.DocumentId,
                 CampaignId = dto.CampaignId,
                 DocumentName = dto.DocumentName,
-                DocumentDescription = dto.DocumentDescription,
+                DocumentDescription = string.IsNullOrWhiteSpace(dto.DocumentDescription) ? null : dto.DocumentDescription,
                 DocumentContentType = dto.DocumentContentType,
                 DocumentContent = dto.DocumentContent,
                 IsGMVisibleOnly = dto.IsGMVisibleOnly,
@@ -167,7 +166,7 @@
             {
                 CampaignId = Document.CampaignId,
                 DocumentName = Document.DocumentName,
-                DocumentDescription = Document.DocumentDescription,
+                DocumentDescription = string.IsNullOrWhiteSpace(Document.DocumentDescription) ? null : Document.DocumentDescription,
                 DocumentContentType = Document.DocumentContentType,
                 DocumentContent = Document.DocumentContent
             };
@@ -179,7 +178,7 @@
             var campaignDocumentToUpdate = new CampaignDocumentUpdateDto
             {
                 DocumentName = Document.DocumentName,
-                DocumentDescription = Document.DocumentDescription,
+                DocumentDescription = string.IsNullOrWhiteSpace(Document.DocumentDescription) ? null : Document.DocumentDescription,
                 DocumentContentType = Document.DocumentContentType,
                 DocumentContent = Document.DocumentContent
             };

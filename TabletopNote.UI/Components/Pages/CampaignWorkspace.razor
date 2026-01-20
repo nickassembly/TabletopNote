@@ -32,32 +32,40 @@
                     @(IsNewCampaign ? "New Campaign" : Campaign.CampaignName)
                 </MudText>
 
-                <MudTextField Label="Campaign Name"
-                              @bind-Value="Campaign.CampaignName"
-                              Variant="Variant.Outlined"
-                              Required />
+                <MudForm @ref="_form" Model="Campaign">
+                    <MudTextField Label="Campaign Name"
+                                  For="@(() => Campaign.CampaignName)"
+                                  Required="true"
+                                  MaxLength="100"
+                                  @bind-Value="Campaign.CampaignName"
+                                  Variant="Variant.Outlined" />
 
-                <MudTextField Label="Description"
-                              @bind-Value="Campaign.CampaignDescription"
-                              Variant="Variant.Outlined"
-                              Lines="4" />
+                    <MudTextField Label="Description"
+                                  For="@(() => Campaign.CampaignDescription)"
+                                  Required="false"
+                                  MaxLength="2000"
+                                  @bind-Value="Campaign.CampaignDescription"
+                                  Variant="Variant.Outlined"
+                                  Lines="4" />
 
-                <MudButton Variant="Variant.Filled"
-                           Color="Color.Success"
-                           StartIcon="@Icons.Material.Filled.Save"
-                           OnClick="SaveCampaign">
-                </MudButton>
+                    <MudButton Variant="Variant.Filled"
+                               Color="Color.Success"
+                               StartIcon="@Icons.Material.Filled.Save"
+                               OnClick="SaveCampaign">
+                    </MudButton>
 
-                <!-- Quick Nav Buttons for small screens -->
-                <MudHidden Breakpoint="Breakpoint.MdAndUp">
-                    <CampaignSectionNav CampaignId="@CampaignId" IsHorizontal="true" ButtonSize="Size.Small" IconSize="Size.Small" />
-                </MudHidden>
+                    <!-- Quick Nav Buttons for small screens -->
+                    <MudHidden Breakpoint="Breakpoint.MdAndUp">
+                        <CampaignSectionNav CampaignId="@CampaignId" IsHorizontal="true" ButtonSize="Size.Small" IconSize="Size.Small" />
+                    </MudHidden>
+                </MudForm>
             </MudStack>
         </MudPaper>
     }
 </MudMainContent>
 
 @code {
+    private MudForm _form = null!;
     private bool IsNewCampaign => CampaignId == 0;
 
     [Parameter]
@@ -71,8 +79,7 @@
         {
             Campaign = new CampaignVM
             {
-                CampaignName = string.Empty,
-                CampaignDescription = string.Empty
+                CampaignName = string.Empty
             };
         }
         else
@@ -83,7 +90,7 @@
             {
                 CampaignId = campaignDto.CampaignId,
                 CampaignName = campaignDto.CampaignName,
-                CampaignDescription = campaignDto.CampaignDescription,
+                CampaignDescription = string.IsNullOrWhiteSpace(campaignDto.CampaignDescription) ? null : campaignDto.CampaignDescription,
                 CampaignDocuments = campaignDto.CampaignDocuments.ToList(),
                 ReferenceDocuments = campaignDto.ReferenceDocuments.ToList(),
                 CalendarEvents = campaignDto.CalendarEvents.ToList()
@@ -98,7 +105,7 @@
             var campaignToAdd = new CampaignAddDto
             {
                 CampaignName = Campaign.CampaignName,
-                CampaignDescription = Campaign.CampaignDescription
+                CampaignDescription = string.IsNullOrWhiteSpace(Campaign.CampaignDescription) ? null : Campaign.CampaignDescription
             };
 
             await DocumentsApi.AddCampaign(campaignToAdd);
@@ -110,7 +117,7 @@
             var campaignToUpdate = new CampaignUpdateDto
             {
                 CampaignName = Campaign.CampaignName,
-                CampaignDescription = Campaign.CampaignDescription
+                CampaignDescription = string.IsNullOrWhiteSpace(Campaign.CampaignDescription) ? null : Campaign.CampaignDescription
             };
 
             await DocumentsApi.UpdateCampaign(campaignToUpdate, CampaignId);

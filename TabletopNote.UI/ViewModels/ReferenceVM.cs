@@ -1,11 +1,20 @@
-﻿namespace TabletopNote.UI.ViewModels
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace TabletopNote.UI.ViewModels
 {
     public class ReferenceVM
     {
         public int CampaignId { get; set; }
         public int FileId { get; set; }
+
+        [Required]
+        [MinLength(3, ErrorMessage = "file name must be at least 3 characters long.")]
+        [MaxLength(100, ErrorMessage = "file name cannot exceed 100 characters.")]
         public string ReferenceFileName { get; set; } = string.Empty;
-        public string FileDescription { get; set; } = string.Empty;
+
+        [MinLength(3, ErrorMessage = "File description must be at least 3 characters long.")]
+        [MaxLength(2000, ErrorMessage = "File description cannot exceed 2000 characters.")]
+        public string? FileDescription { get; set; }
         public string? FilePath { get; set; }
         public string? Url { get; set; }
     }

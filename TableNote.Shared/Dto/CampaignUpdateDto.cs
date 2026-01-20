@@ -12,6 +12,6 @@ namespace TabletopNote.Shared.Dto
 
         [MinLength(3, ErrorMessage = "Description must be at least 3 characters long.")]
         [MaxLength(2000, ErrorMessage = "Description cannot exceed 2000 characters.")]
-        public string CampaignDescription { get; set; } = string.Empty;
+        public string? CampaignDescription { get; set; }
     }
 }

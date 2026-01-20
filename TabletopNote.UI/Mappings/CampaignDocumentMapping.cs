@@ -5,10 +5,10 @@ namespace TabletopNote.UI.Mappings
 {
     public static class CampaignDocumentMappings
     {
-        public static CampaignDocumentVM ToViewModel(
+        public static DocumentVM ToViewModel(
             this CampaignDocumentDto dto)
         {
-            return new CampaignDocumentVM
+            return new DocumentVM
             {
                 CampaignId = dto.CampaignId,
                 DocumentId = dto.DocumentId,

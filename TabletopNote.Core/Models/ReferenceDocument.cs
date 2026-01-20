@@ -5,7 +5,7 @@ namespace TabletopNote.Core.Models
     {
         public int FileId { get; set; }
         public string ReferenceFileName { get; set; } = string.Empty;
-        public string FileDescription { get; set; } = string.Empty;
+        public string? FileDescription { get; set; }
         public string? FilePath { get; set; }
         public string? Url { get; set; }
         public bool IsGMVisibleOnly { get; set; }

@@ -5,6 +5,6 @@ namespace TabletopNote.UI.ViewModels
     {
         public int CampaignId { get; set; }
         public string CampaignName { get; set; } = string.Empty;
-        public List<CampaignDocumentVM> CampaignDocuments { get; set; } = [];
+        public List<DocumentVM> CampaignDocuments { get; set; } = [];
     }
 }

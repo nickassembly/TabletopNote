@@ -29,16 +29,18 @@
                 @(IsNewReference ? "Add New Reference" : Reference.ReferenceFileName)
             </MudText>
 
-            <MudForm @ref="_form">
+            <MudForm @ref="_form" Model="Reference">
                 <MudTextField @bind-Value="Reference.ReferenceFileName"
                               Label="File Name"
                               Required="true"
+                              MaxLength="100"
                               For="@(() => Reference.ReferenceFileName)"
                               Variant="Variant.Outlined" />
 
                 <MudTextField @bind-Value="Reference.FileDescription"
                               Label="Summary of Content"
-                              Required="true"
+                              Required="false"
+                              MaxLength="2000"
                               For="@(() => Reference.FileDescription)"
                               Lines="3"
                               Variant="Variant.Outlined" />
@@ -127,7 +129,6 @@
             {
                 CampaignId = CampaignId,
                 ReferenceFileName = string.Empty,
-                FileDescription = string.Empty,
                 FilePath = string.Empty,
                 Url = string.Empty
             };
@@ -140,7 +141,7 @@
             {
                 CampaignId = dto.CampaignId,
                 ReferenceFileName = dto.ReferenceFileName,
-                FileDescription = dto.FileDescription,
+                FileDescription = string.IsNullOrWhiteSpace(dto.FileDescription) ? null : dto.FileDescription,
                 FilePath = dto.FilePath,
                 Url = dto.Url
             };
@@ -155,7 +156,7 @@
             {
                 CampaignId = Reference.CampaignId,
                 ReferenceFileName = Reference.ReferenceFileName,
-                FileDescription = Reference.FileDescription,
+                FileDescription = string.IsNullOrWhiteSpace(Reference.FileDescription) ? null : Reference.FileDescription,
                 FilePath = Reference.FilePath,
                 Url = Reference.Url
             };
@@ -167,7 +168,7 @@
             var referenceDocumentToUpdate = new ReferenceDocumentUpdateDto
             {
                 ReferenceFileName = Reference.ReferenceFileName,
-                FileDescription = Reference.FileDescription,
+                FileDescription = string.IsNullOrWhiteSpace(Reference.FileDescription) ? null : Reference.FileDescription,
                 FilePath = Reference.FilePath,
                 Url = Reference.Url
             };
