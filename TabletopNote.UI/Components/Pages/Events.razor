@@ -88,6 +88,13 @@ else
                                            OnClick="() => UpdateSelectedEvent(campaignEvent.CalendarEventId)">
                                     View / Edit
                                 </MudButton>
+                                <MudButton Variant="Variant.Text"
+                                           Size="Size.Small"
+                                           Color="Color.Error"
+                                           StartIcon="@Icons.Material.Filled.Delete"
+                                           OnClick="() => DeleteCalendarEvent(CampaignId, campaignEvent.CalendarEventId)">
+                                    Delete
+                                </MudButton>
                             </MudStack>
                         </MudPaper>
                     </ChildContent>
