@@ -32,11 +32,12 @@
                     @(IsNewCampaign ? "New Campaign" : Campaign.CampaignName)
                 </MudText>
 
-                <MudForm @ref="_form" Model="Campaign">
+                <MudForm @ref="_form" Model="Campaign" @bind-IsValid="_isFormValid">
                     <MudTextField Label="Campaign Name"
                                   For="@(() => Campaign.CampaignName)"
                                   Required="true"
                                   MaxLength="100"
+                                  Immediate="true"
                                   @bind-Value="Campaign.CampaignName"
                                   Variant="Variant.Outlined" />
 
@@ -44,11 +45,13 @@
                                   For="@(() => Campaign.CampaignDescription)"
                                   Required="false"
                                   MaxLength="2000"
+                                  Immediate="true"
                                   @bind-Value="Campaign.CampaignDescription"
                                   Variant="Variant.Outlined"
                                   Lines="4" />
 
                     <MudButton Variant="Variant.Filled"
+                               Disabled="!_isFormValid"
                                Color="Color.Success"
                                StartIcon="@Icons.Material.Filled.Save"
                                OnClick="SaveCampaign">
@@ -66,6 +69,7 @@
 
 @code {
     private MudForm _form = null!;
+    private bool _isFormValid;
     private bool IsNewCampaign => CampaignId == 0;
 
     [Parameter]
@@ -100,30 +104,38 @@
 
     public async Task SaveCampaign()
     {
+        await _form.Validate();
+
+        if (!_form.IsValid)
+            return;
+
         if (IsNewCampaign)
         {
             var campaignToAdd = new CampaignAddDto
             {
                 CampaignName = Campaign.CampaignName,
-                CampaignDescription = string.IsNullOrWhiteSpace(Campaign.CampaignDescription) ? null : Campaign.CampaignDescription
+                CampaignDescription = string.IsNullOrWhiteSpace(Campaign.CampaignDescription)
+                    ? null
+                    : Campaign.CampaignDescription
             };
 
             await DocumentsApi.AddCampaign(campaignToAdd);
-
-            NavigationManager.NavigateTo($"/");
         }
         else
         {
             var campaignToUpdate = new CampaignUpdateDto
             {
                 CampaignName = Campaign.CampaignName,
-                CampaignDescription = string.IsNullOrWhiteSpace(Campaign.CampaignDescription) ? null : Campaign.CampaignDescription
+                CampaignDescription = string.IsNullOrWhiteSpace(Campaign.CampaignDescription)
+                    ? null
+                    : Campaign.CampaignDescription
             };
 
             await DocumentsApi.UpdateCampaign(campaignToUpdate, CampaignId);
-
-            NavigationManager.NavigateTo($"/");
         }
+
+        NavigationManager.NavigateTo("/");
     }
+
 
 }

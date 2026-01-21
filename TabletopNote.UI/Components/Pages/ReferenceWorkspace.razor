@@ -29,9 +29,10 @@
                 @(IsNewReference ? "Add New Reference" : Reference.ReferenceFileName)
             </MudText>
 
-            <MudForm @ref="_form" Model="Reference">
+            <MudForm @ref="_form" Model="Reference" @bind-IsValid="_isFormValid">
                 <MudTextField @bind-Value="Reference.ReferenceFileName"
                               Label="File Name"
+                              Immediate="true"
                               Required="true"
                               MaxLength="100"
                               For="@(() => Reference.ReferenceFileName)"
@@ -39,6 +40,7 @@
 
                 <MudTextField @bind-Value="Reference.FileDescription"
                               Label="Summary of Content"
+                              Immediate="true"
                               Required="false"
                               MaxLength="2000"
                               For="@(() => Reference.FileDescription)"
@@ -100,6 +102,7 @@
                     </MudButton>
 
                     <MudButton Variant="Variant.Filled"
+                               Disabled="!_isFormValid"
                                Color="Color.Primary"
                                OnClick="SaveReferenceDocument">
                         Save
@@ -115,6 +118,7 @@
     private IBrowserFile? _selectedFile;
 
     private MudForm _form = null!;
+    private bool _isFormValid;
 
     [Parameter] public int FileId { get; set; }
     [Parameter] public int CampaignId { get; set; }
@@ -150,6 +154,11 @@
 
     private async Task SaveReferenceDocument()
     {
+        await _form.Validate();
+
+        if (!_form.IsValid)
+            return;
+
         if (IsNewReference)
         {
             var referenceDocumentToAdd = new ReferenceDocumentAddDto

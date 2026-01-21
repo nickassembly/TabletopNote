@@ -29,7 +29,7 @@
                 @(IsNewDocument ? "New Document" : Document.DocumentName)
             </MudText>
 
-            <MudForm @ref="_form" Model="Document">
+            <MudForm @ref="_form" Model="Document" @bind-IsValid="_isFormValid">
                 <MudToggleGroup T="DocumentContentType"
                                 @bind-Value="Document.DocumentContentType"
                                 Color="Color.Primary"
@@ -50,6 +50,7 @@
                 <MudTextField @bind-Value="Document.DocumentName"
                               Label="Title"
                               For="@(() => Document.DocumentName)"
+                              Immediate="true"
                               Required="true"
                               MaxLength="100"
                               Variant="Variant.Outlined" />
@@ -57,6 +58,8 @@
                 <MudTextField @bind-Value="Document.DocumentDescription"
                               Label="Summary"
                               For="@(() => Document.DocumentDescription)"
+                              Immediate="true"
+                              Required="false"
                               MaxLength="2000"
                               Lines="3"
                               Variant="Variant.Outlined" />
@@ -95,6 +98,7 @@
                     </MudButton>
 
                     <MudButton Variant="Variant.Filled"
+                               Disabled="!_isFormValid"
                                Color="Color.Primary"
                                OnClick="SaveCampaignDocument">
                         Save
@@ -107,6 +111,7 @@
 
 @code {
     private MudForm _form = null!;
+    private bool _isFormValid;
 
     private DateTime? userLocalCreatedAt;
     private DateTime? userLocalUpdatedAt;
@@ -160,6 +165,11 @@
 
     private async Task SaveCampaignDocument()
     {
+        await _form.Validate();
+
+        if (!_form.IsValid)
+            return;
+
         if (IsNewDocument)
         {
             var campaignDocumentToAdd = new CampaignDocumentAddDto
