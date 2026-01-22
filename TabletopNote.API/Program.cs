@@ -4,6 +4,15 @@ using Microsoft.Data.Sqlite;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("TableTopUI",
+        policy => policy
+            .WithOrigins("tabletopnote-api-h5gmcthkhqbeamdm.centralus-01.azurewebsites.net")
+            .AllowAnyHeader()
+            .AllowAnyMethod());
+});
+
 var connectionString = builder.Configuration.GetConnectionString("Default");
 
 builder.Services.AddDbContext<TabletopNoteDbContext>(options =>
@@ -28,10 +37,13 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
+
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
+
+app.UseCors("TableTopUI");
 
 // Apply pending migrations at startup
 using var scope = app.Services.CreateScope();

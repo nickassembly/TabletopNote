@@ -7,9 +7,12 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-builder.Services.AddHttpClient<DocumentsApiClient>(client =>
+builder.Services.AddHttpClient<DocumentsApiClient>((sp, client) =>
 {
-    client.BaseAddress = new Uri("https://localhost:7108/");
+    var config = sp.GetRequiredService<IConfiguration>();
+    var apiBaseUrl = config["ApiBaseUrl"];
+
+    client.BaseAddress = new Uri(apiBaseUrl!);
 });
 
 builder.Services.AddMudServices();
