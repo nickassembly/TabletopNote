@@ -4,7 +4,9 @@ using TabletopNote.UI.Components;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddRazorComponents();
+builder.Services.AddRazorComponents()
+       .AddInteractiveServerComponents();
+
 builder.Services.AddMudServices();
 
 builder.Services.AddHttpClient<DocumentsApiClient>((sp, client) =>
@@ -15,22 +17,28 @@ builder.Services.AddHttpClient<DocumentsApiClient>((sp, client) =>
 
 builder.Services.AddScoped<UserTimeService>();
 
+builder.Services.AddAntiforgery(options =>
+{
+    options.HeaderName = "X-CSRF-TOKEN";
+});
+
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
 {
+    app.UseExceptionHandler("/Error", createScopeForErrors: true);
     app.UseHsts();
 }
 
-var httpsPort = app.Urls.Select(url => new Uri(url))
-                        .FirstOrDefault(u => u.Scheme == "https")?.Port;
+app.UseHttpsRedirection();
 
-if (httpsPort.HasValue)
-{
-    app.UseHttpsRedirection();
-}
+app.UseRouting();
+
+app.UseAntiforgery();
 
 app.MapStaticAssets();
-app.MapRazorComponents<App>();
+
+app.MapRazorComponents<App>()
+   .AddInteractiveServerRenderMode();
 
 app.Run();
