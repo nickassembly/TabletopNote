@@ -6,6 +6,8 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddRazorComponents();
 
+builder.Services.AddMudServices();
+
 builder.Services.AddHttpClient<DocumentsApiClient>((sp, client) =>
 {
     var config = sp.GetRequiredService<IConfiguration>();
@@ -13,22 +15,31 @@ builder.Services.AddHttpClient<DocumentsApiClient>((sp, client) =>
     client.BaseAddress = new Uri(apiBaseUrl!);
 });
 
-builder.Services.AddMudServices();
-
 builder.Services.AddScoped<UserTimeService>();
 
+builder.Services.AddAntiforgery(options =>
+{
+    options.HeaderName = "X-CSRF-TOKEN";
+});
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
+// HTTPS Redirection only if HTTPS port is available
+var httpsPort = app.Urls.Select(url => new Uri(url))
+                        .FirstOrDefault(u => u.Scheme == "https")?.Port;
+
+if (httpsPort.HasValue)
+{
+    app.UseHttpsRedirection();
+}
+
+app.UseAntiforgery();
 
 app.MapStaticAssets();
 
