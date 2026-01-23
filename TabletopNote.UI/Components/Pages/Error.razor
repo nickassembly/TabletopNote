@@ -1,11 +1,17 @@
-﻿@using System.Diagnostics
+﻿@page "/Error"
+@using System.Diagnostics
 
 <h1 class="text-danger">An error occurred.</h1>
-<h2 class="text-danger">Sorry, something went wrong while processing your request.</h2>
+<h2 class="text-danger">
+    Sorry, something went wrong while processing your request.
+</h2>
 
 @if (!string.IsNullOrEmpty(RequestId))
 {
-    <p><strong>Request ID:</strong> <code>@RequestId</code></p>
+    <p>
+        <strong>Request ID:</strong>
+        <code>@RequestId</code>
+    </p>
 }
 
 @code {
