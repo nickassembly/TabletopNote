@@ -8,12 +8,13 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("TableTopUI",
         policy => policy
-            .WithOrigins("tabletopnote-api-h5gmcthkhqbeamdm.centralus-01.azurewebsites.net")
+            .WithOrigins("https://tabletopnotewebapp-dubhgkdcfpb0dugb.centralus-01.azurewebsites.net")
             .AllowAnyHeader()
             .AllowAnyMethod());
 });
 
 var connectionString = builder.Configuration.GetConnectionString("Default");
+Console.WriteLine($"SQLite path in use: {connectionString}");
 
 builder.Services.AddDbContext<TabletopNoteDbContext>(options =>
 {
@@ -33,14 +34,14 @@ if (!string.IsNullOrEmpty(dbDirectory) && !Directory.Exists(dbDirectory))
 
 builder.Services.AddControllers();
 
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+builder.Logging.AddDebug();
+builder.Logging.SetMinimumLevel(LogLevel.Information);
+
 var app = builder.Build();
 
 app.UseCors("TableTopUI");
-
-// Apply pending migrations at startup
-using var scope = app.Services.CreateScope();
-var db = scope.ServiceProvider.GetRequiredService<TabletopNoteDbContext>();
-db.Database.Migrate();
 
 app.UseHttpsRedirection();
 

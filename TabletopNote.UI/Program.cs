@@ -15,6 +15,12 @@ builder.Services.AddHttpClient<DocumentsApiClient>((sp, client) =>
     client.BaseAddress = new Uri(config["ApiBaseUrl"]!);
 });
 
+builder.Services.AddServerSideBlazor()
+       .AddCircuitOptions(options =>
+       {
+           options.DetailedErrors = true;
+       });
+
 builder.Services.AddScoped<UserTimeService>();
 
 var app = builder.Build();

@@ -1,98 +1,89 @@
 ﻿@page "/"
 @using TabletopNote.Shared
 @using TabletopNote.UI.Clients
-@using TabletopNote.UI.Mappings
 @using TabletopNote.UI.ViewModels
 @using TabletopNote.Shared.Dto
 @inject DocumentsApiClient DocumentsApi
 @inject NavigationManager NavigationManager
 
-<!-- Side Panel -->
-<MudDrawer Open="true"
-           Variant="DrawerVariant.Persistent"
-           Elevation="1"
-           Width="240px">
+@if (!isInteractive)
+{
+    <p>Loading campaigns...</p>
+}
+else
+{
+    <!-- Side Panel -->
+    <MudDrawer Open="true"
+               Variant="DrawerVariant.Persistent"
+               Elevation="1"
+               Width="240px">
 
-    <MudStack Class="pa-4" Spacing="2">
-        <MudButton StartIcon="@Icons.Material.Filled.Add"
-                   Color="Color.Primary"
-                   Variant="Variant.Filled"
-                   OnClick="AddCampaign">
-            New Campaign
-        </MudButton>
-    </MudStack>
-</MudDrawer>
-
-<MudMainContent>
-    <MudContainer MaxWidth="MaxWidth.False" Class="pa-6">
-        <MudStack Direction="Column" AlignItems=AlignItems.Center Spacing="1" Class="mb-4">
-            <MudIcon Icon="@Icons.Material.Filled.Book" Size="Size.Large" />
-            <MudText Typo="Typo.h4">
-                Campaigns
-            </MudText>
+        <MudStack Class="pa-4" Spacing="2">
+            <MudButton StartIcon="@Icons.Material.Filled.Add"
+                       Color="Color.Primary"
+                       Variant="Variant.Filled"
+                       OnClick="AddCampaign">
+                New Campaign
+            </MudButton>
         </MudStack>
+    </MudDrawer>
 
-        <MudGrid Spacing="3">
-            @foreach (var campaign in CampaignList)
-            {
-                <MudItem xs="12" sm="6" md="4" lg="3" @key="campaign.CampaignId">
-                    <MudCard Class="campaign-card"
-                             Elevation="3"
-                             Style="cursor:pointer"
-                             @onclick="() => OpenCampaign(campaign.CampaignId)">
+    <MudMainContent>
+        <MudContainer MaxWidth="MaxWidth.False" Class="pa-6">
+            <MudStack Direction="Column" AlignItems=AlignItems.Center Spacing="1" Class="mb-4">
+                <MudIcon Icon="@Icons.Material.Filled.Book" Size="Size.Large" />
+                <MudText Typo="Typo.h4">
+                    Campaigns
+                </MudText>
+            </MudStack>
 
-                        <MudCardHeader>
-                            <MudText Typo="Typo.h5">
-                                @campaign.CampaignName
-                            </MudText>
-                        </MudCardHeader>
+            <MudGrid Spacing="3">
+                @foreach (var campaign in CampaignList)
+                {
+                    <MudItem xs="12" sm="6" md="4" lg="3" @key="campaign.CampaignId">
+                        <MudCard Class="campaign-card"
+                                 Elevation="3"
+                                 Style="cursor:pointer"
+                                 @onclick="() => OpenCampaign(campaign.CampaignId)">
 
-                        <MudCardContent>
-                            <MudText Typo="Typo.body2" Color="Color.Secondary">
-                                @campaign.CampaignDescription
-                            </MudText>
-                        </MudCardContent>
+                            <MudCardHeader>
+                                <MudText Typo="Typo.h5">
+                                    @campaign.CampaignName
+                                </MudText>
+                            </MudCardHeader>
 
-                        <MudCardActions Class="justify-end">
-                            <MudIconButton Icon="@Icons.Material.Filled.Delete"
-                                           Size="Size.Small"
-                                           Color="Color.Error"
-                                           StopPropagation="true"
-                                           OnClick="() => DeleteCampaign(campaign.CampaignId)" />
-                        </MudCardActions>
-                    </MudCard>
-                </MudItem>
-            }
-        </MudGrid>
-    </MudContainer>
-</MudMainContent>
+                            <MudCardContent>
+                                <MudText Typo="Typo.body2" Color="Color.Secondary">
+                                    @campaign.CampaignDescription
+                                </MudText>
+                            </MudCardContent>
 
+                            <MudCardActions Class="justify-end">
+                                <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                               Size="Size.Small"
+                                               Color="Color.Error"
+                                               StopPropagation="true"
+                                               OnClick="() => DeleteCampaign(campaign.CampaignId)" />
+                            </MudCardActions>
+                        </MudCard>
+                    </MudItem>
+                }
+            </MudGrid>
+        </MudContainer>
+    </MudMainContent>
+}
 
 @code {
-    List<CampaignVM> CampaignList = new();
-
-    // protected override async Task OnInitializedAsync()
-    // {
-    //     List<CampaignDto> campaignDtos = await DocumentsApi.GetAllCampaigns();
-
-    //     foreach (var campaignDto in campaignDtos)
-    //     {
-    //         CampaignList.Add(new CampaignVM
-    //         {
-    //             CampaignId = campaignDto.CampaignId,
-    //             CampaignName = campaignDto.CampaignName,
-    //             CampaignDescription = campaignDto.CampaignDescription,
-    //             CampaignDocuments = campaignDto.CampaignDocuments.ToList(),
-    //             ReferenceDocuments = campaignDto.ReferenceDocuments.ToList(),
-    //             CalendarEvents = campaignDto.CalendarEvents.ToList()
-    //         });
-    //     }
-    // }
+    private bool isInteractive = false;
+    private List<CampaignVM> CampaignList = new();
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
+            isInteractive = true;
+            StateHasChanged(); 
+
             try
             {
                 List<CampaignDto> campaignDtos = await DocumentsApi.GetAllCampaigns();
@@ -117,10 +108,10 @@
             catch (Exception ex)
             {
                 Console.WriteLine($"API call failed: {ex.Message}");
+                CampaignList.Clear();
             }
         }
     }
-
 
     void AddCampaign()
     {
@@ -134,16 +125,17 @@
 
     async Task DeleteCampaign(int campaignId)
     {
-        await DocumentsApi.DeleteCampaign(campaignId);
-
-        var campaignToRemove = CampaignList.FirstOrDefault(c => c.CampaignId == campaignId);
-
-        if (campaignToRemove != null)
+        try
         {
-            CampaignList.Remove(campaignToRemove);
-        }
+            await DocumentsApi.DeleteCampaign(campaignId);
+            var campaignToRemove = CampaignList.FirstOrDefault(c => c.CampaignId == campaignId);
+            if (campaignToRemove != null) CampaignList.Remove(campaignToRemove);
 
-        StateHasChanged();
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Delete failed: {ex.Message}");
+        }
     }
 }
-
