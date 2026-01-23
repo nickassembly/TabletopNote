@@ -71,23 +71,56 @@
 @code {
     List<CampaignVM> CampaignList = new();
 
-    protected override async Task OnInitializedAsync()
-    {
-        List<CampaignDto> campaignDtos = await DocumentsApi.GetAllCampaigns();
+    // protected override async Task OnInitializedAsync()
+    // {
+    //     List<CampaignDto> campaignDtos = await DocumentsApi.GetAllCampaigns();
 
-        foreach (var campaignDto in campaignDtos)
+    //     foreach (var campaignDto in campaignDtos)
+    //     {
+    //         CampaignList.Add(new CampaignVM
+    //         {
+    //             CampaignId = campaignDto.CampaignId,
+    //             CampaignName = campaignDto.CampaignName,
+    //             CampaignDescription = campaignDto.CampaignDescription,
+    //             CampaignDocuments = campaignDto.CampaignDocuments.ToList(),
+    //             ReferenceDocuments = campaignDto.ReferenceDocuments.ToList(),
+    //             CalendarEvents = campaignDto.CalendarEvents.ToList()
+    //         });
+    //     }
+    // }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
         {
-            CampaignList.Add(new CampaignVM
+            try
             {
-                CampaignId = campaignDto.CampaignId,
-                CampaignName = campaignDto.CampaignName,
-                CampaignDescription = campaignDto.CampaignDescription,
-                CampaignDocuments = campaignDto.CampaignDocuments.ToList(),
-                ReferenceDocuments = campaignDto.ReferenceDocuments.ToList(),
-                CalendarEvents = campaignDto.CalendarEvents.ToList()
-            });
+                List<CampaignDto> campaignDtos = await DocumentsApi.GetAllCampaigns();
+
+                CampaignList.Clear();
+
+                foreach (var campaignDto in campaignDtos)
+                {
+                    CampaignList.Add(new CampaignVM
+                    {
+                        CampaignId = campaignDto.CampaignId,
+                        CampaignName = campaignDto.CampaignName,
+                        CampaignDescription = campaignDto.CampaignDescription,
+                        CampaignDocuments = campaignDto.CampaignDocuments.ToList(),
+                        ReferenceDocuments = campaignDto.ReferenceDocuments.ToList(),
+                        CalendarEvents = campaignDto.CalendarEvents.ToList()
+                    });
+                }
+
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"API call failed: {ex.Message}");
+            }
         }
     }
+
 
     void AddCampaign()
     {
